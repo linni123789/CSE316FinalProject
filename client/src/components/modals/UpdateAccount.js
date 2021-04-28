@@ -23,11 +23,10 @@ const UpdateAccount = (props) => {
 				return;
 			}
 		}
-		console.log(props.user)
 		const { loading, error, data } = await Update({ variables: { ...input, _id: props.user._id}});
 		toggleLoading(true);
 		props.setShowUpdate();
-
+		props.fetchUser();
 	};
 
 	return (

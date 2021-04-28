@@ -10,9 +10,10 @@ const LoggedIn = (props) => {
     const handleLogout = async (e) => {
         Logout();
         const { data } = await props.fetchUser();
+        props.toggleWelcome(true);
         if (data) {
             let reset = await client.resetStore();
-            if (reset) props.setActiveList({});
+            // if (reset) props.setActiveList({});
         }
     };
 
@@ -54,8 +55,8 @@ const NavbarOptions = (props) => {
     return (
         <>
             {
-                props.auth === false ? <LoggedOut setShowLogin={props.setShowLogin} setShowCreate={props.setShowCreate}/>
-                : <LoggedIn fetchUser={props.fetchUser} setActiveList={props.setActiveList} logout={props.logout} setShowUpdate = {props.setShowUpdate} user = {props.user} />
+                props.auth === false ? <LoggedOut setShowLogin={props.setShowLogin} setShowCreate={props.setShowCreate} toggleWelcome={props.toggleWelcome}/>
+                : <LoggedIn fetchUser={props.fetchUser} setActiveList={props.setActiveList} logout={props.logout} setShowUpdate = {props.setShowUpdate} user = {props.user} toggleWelcome={props.toggleWelcome} />
             }
         </>
 

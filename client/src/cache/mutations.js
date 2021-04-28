@@ -124,3 +124,9 @@ export const UPDATE_TODOLIST_FIELD = gql`
 		updateTodolistField(_id: $_id, field: $field, value: $value)
 	}
 `;
+
+export const ADD_MAP = gql`
+	mutation AddMap($region: RegionInput!){
+		addMap(region: $region)
+	}
+`;
