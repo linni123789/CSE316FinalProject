@@ -27,10 +27,10 @@ const Login = (props) => {
 		}
 		if (data) {
 			props.fetchUser();
-			props.reloadTodos();
+			props.reloadRegions();
 			toggleLoading(false);
 			props.setShowLogin(false); 
-			props.toggleWelcome();
+			props.toggleWelcome(false);
 			props.toggleShowMaps(true);
 		};
 	};

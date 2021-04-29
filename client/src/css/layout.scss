@@ -138,10 +138,23 @@ html {
 .sidebar-header {
     width: calc(100% - 48px);
     box-sizing: border-box;
-    margin-left: 24px;
+    margin-left: 50%;
     margin-right: 24px;
     padding-top: 24px;
     padding-bottom: 12px
+}
+
+.maps {
+    position:absolute;
+    margin-left: 20%;
+    margin-top: 8%;
+    background-color:darkgray;
+}
+
+.map-header{
+    margin-left:0%;
+    background-color: gray;
+    text-align: left;
 }
 
 .sidebar-options {
@@ -231,7 +244,7 @@ html {
     position:absolute;
     font-size: 85px;
     height:20%;
-    bottom:10%;
+    bottom:65%;
     right:30%;
     left:30%;
     text-align: center;

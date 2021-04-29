@@ -8,7 +8,7 @@ import MapContents                      from '../maps/MapContents'
 import CreateAccount 					from '../modals/CreateAccount';
 import NavbarOptions 					from '../navbar/NavbarOptions';
 import * as mutations 					from '../../cache/mutations';
-import { GET_DB_TODOS } 				from '../../cache/queries';
+import { GET_DB_REGION } 				from '../../cache/queries';
 import React, { useState } 				from 'react';
 import { useMutation, useQuery } 		from '@apollo/client';
 import { WNavbar, WSidebar, WNavItem } 	from 'wt-frontend';
@@ -35,7 +35,8 @@ const Homescreen = (props) => {
 	document.onkeydown = keyCombination;
 
 	const auth = props.user === null ? false : true;
-	let todolists 	= [];
+	let regions	= [];
+	let maps = [];
 	let SidebarData = [];
 	const [sortRule, setSortRule] = useState('unsorted'); // 1 is ascending, -1 desc
 	const [activeList, setActiveList] 		= useState({});
@@ -43,13 +44,24 @@ const Homescreen = (props) => {
 	const [showLogin, toggleShowLogin] 		= useState(false);
 	const [showCreate, toggleShowCreate] 	= useState(false);
 	const [showUpdate, toggleShowUpdate]    = useState(false);
-	const [showWelcome, toggleWelcome] 			= useState(true);
+	const [showWelcome, toggleWelcome] 		= useState(true);
 	const [showMaps, toggleShowMaps]        = useState(false);
 	const [canUndo, setCanUndo] = useState(props.tps.hasTransactionToUndo());
 	const [canRedo, setCanRedo] = useState(props.tps.hasTransactionToRedo());
 
-	const { loading, error, data, refetch } = useQuery(GET_DB_TODOS);
-	// console.log(showUpdate);
+	const { loading, error, data, refetch } = useQuery(GET_DB_REGION);
+	if(loading) { console.log(loading, 'loading'); }
+	if(error) { console.log(error, 'error'); }
+	if(data) {
+		// Assign todolists 
+		for(let region of data.getAllRegions) {
+			regions.push(region)
+			if (region.parentRegion === "none"){
+				maps.push(region)
+			}
+		}
+	}
+
 	// if(loading) { console.log(loading, 'loading'); }
 	// if(error) { console.log(error, 'error'); }
 	// if(data) { 
@@ -105,7 +117,9 @@ const Homescreen = (props) => {
 	// const [AddTodolist] 			= useMutation(mutations.ADD_TODOLIST);
 	// const [DeleteTodolist] 			= useMutation(mutations.DELETE_TODOLIST);
 
-	const[AddNewMap] = useMutation(mutations.ADD_MAP);
+	const[AddMap] = useMutation(mutations.ADD_MAP);
+	const[DeleteMap] = useMutation(mutations.DELETE_MAP);
+	const[UpdateMap] = useMutation(mutations.UPDATE_MAP);
 
 	
 	const tpsUndo = async () => {
@@ -220,8 +234,16 @@ const Homescreen = (props) => {
 			landmarks: [],
 			subregions: []
 		}
-		const{ data} = await AddNewMap({ variables: { region: Map}});
+		console.log(Map);
+		const{data} = await AddMap({ variables: {region: Map},refetchQueries: [{ query: GET_DB_REGION }]});
+	}
 
+	const deleteMap = async(id) => {
+		const{data} = await DeleteMap({variables:{_id: id},refetchQueries: [{ query: GET_DB_REGION }]});
+	}
+
+	const updateMapName = async(_id, name) => {
+		const{data} = await UpdateMap({variables:{_id: _id, name: name},refetchQueries: [{ query: GET_DB_REGION }]});
 	}
 
 	const setShowLogin = () => {
@@ -277,6 +299,7 @@ const Homescreen = (props) => {
 							setShowCreate={setShowCreate} 	setShowLogin={setShowLogin}
 							setShowUpdate = {setShowUpdate}
 							user = {props.user}
+							toggleShowMaps = {toggleShowMaps}
 							toggleWelcome = {toggleWelcome}
 						/>
 					</ul>
@@ -320,18 +343,18 @@ const Homescreen = (props) => {
 				showWelcome && (<Welcome/>)
 			}
 			{
-				showMaps && (<MapContents addMap = {addMap}/>)
+				showMaps && (<MapContents addMap = {addMap} maps = {maps} deleteMap = {deleteMap} updateMapName = {updateMapName} reloadRegions={refetch}/>)
 			}
 			{
 				showDelete && (<Delete activeid={activeList._id} setShowDelete={setShowDelete} />)
 			}
 
 			{
-				showCreate && (<CreateAccount fetchUser={props.fetchUser} setShowCreate={setShowCreate} />)
+				showCreate && (<CreateAccount fetchUser={props.fetchUser}toggleShowMaps = {toggleShowMaps} toggleWelcome = {toggleWelcome} setShowCreate={setShowCreate} />)
 			}
 
 			{
-				showLogin && (<Login fetchUser={props.fetchUser} reloadTodos={refetch}setShowLogin={setShowLogin} toggleShowMaps = {toggleShowMaps} toggleWelcome = {toggleWelcome} setShowUpdate={setShowUpdate}/>)
+				showLogin && (<Login fetchUser={props.fetchUser} reloadRegions={refetch} setShowLogin={setShowLogin} toggleShowMaps = {toggleShowMaps} toggleWelcome = {toggleWelcome} setShowUpdate={setShowUpdate}/>)
 			}
 
 			{

@@ -130,3 +130,15 @@ export const ADD_MAP = gql`
 		addMap(region: $region)
 	}
 `;
+
+export const DELETE_MAP = gql`
+	mutation DeleteMap($_id: String!){
+		deleteMap(_id: $_id)
+	}
+`;
+
+export const UPDATE_MAP = gql`
+	mutation UpdateMap($_id: String!, $name: String!){
+		updateMap(_id: $_id, name: $name)
+	}
+`;

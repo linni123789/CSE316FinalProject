@@ -13,10 +13,12 @@ const typeDefs = gql `
 		subregions: [String]
 	}
 	extend type Query {
-		getMapList: Region
+		getAllRegions: [Region]
 	}
 	extend type Mutation {
         addMap(region: RegionInput!): String
+		deleteMap(_id: String!): String
+		updateMap(_id: String!, name: String!): String
 	}
 
 	input RegionInput {

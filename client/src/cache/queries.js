@@ -29,3 +29,19 @@ export const GET_DB_TODOS = gql`
 		}
 	}
 `;
+
+
+export const GET_DB_REGION = gql`
+	query GetDBRegions{
+		getAllRegions{
+			_id
+			owner
+			capital
+			leader
+			name
+			parentRegion
+			landmarks
+			subregions
+		}
+	}
+`;

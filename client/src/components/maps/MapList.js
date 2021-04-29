@@ -6,12 +6,13 @@ const MapList = (props) => {
     return (
         <>
             {
-                props.listIDs &&
-                props.listIDs.map(entry => (
+                props.maps &&
+                props.maps.map(entry => (
                     <MapEntry
-                        handleSetActive={props.handleSetActive} activeid={props.activeid}
-                        id={tempID++} key={entry._id+props.activeid} name={entry.name} _id={entry._id}
-                        updateListField={props.updateListField}
+                        key={entry._id}
+                        name={entry.name} _id={entry._id}
+                        deleteMap = {props.deleteMap}
+                        updateMapName = {props.updateMapName}
                     />
                 ))
             }
