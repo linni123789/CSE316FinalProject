@@ -14,6 +14,14 @@ module.exports = {
 			if (regions){
 				return (regions);
 			}
+		},
+		getRegionByID: async(_,args) => {
+			const {_id} = args;
+			const objectId = new ObjectId(_id);
+			const region = await Region.find({_id: objectId});
+			if (region){
+				return(region);
+			}
 		}
 	},
 	Mutation: {
@@ -36,16 +44,34 @@ module.exports = {
 		},
 		deleteMap: async(_,args) => {
 			const{_id} = args;
-			console.log(_id);
 			const objectId = new ObjectId(_id);
 			const deleted = await Region.deleteOne({_id: objectId});
 			return "done";
 		},
 		updateMap: async(_,args) => {
 			const{_id, name} = args;
-			console.log(name);
 			const objectId = new ObjectId(_id);
-			const updated = await Region.updateOne(({_id: objectId}, {name: name}));
+			const updated = await Region.updateOne({_id: objectId}, {name: name});
+			return "done";
+		},
+		addSubRegion: async(_,args) => {								
+			const{_id} = args;
+			const objectId = new ObjectId(_id);
+			const parentRegion = await Region.findOne({_id: objectId});
+			const newRegionID = new ObjectId();
+			parentRegion.subregions.push(newRegionID);
+			const updated = await Region.updateOne({_id: objectId},{subregions: parentRegion.subregions});
+			let newSubRegion = new Region({
+				_id: newRegionID,
+				owner: parentRegion.owner,
+				capital: "none",
+				leader: "none",
+				name: "none",
+				parentRegion: _id,
+				landmarks: [],
+				subregions: []
+			})
+			const updated2 = await newSubRegion.save();
 			return "done";
 		}
 }

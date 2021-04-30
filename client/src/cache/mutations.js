@@ -142,3 +142,9 @@ export const UPDATE_MAP = gql`
 		updateMap(_id: $_id, name: $name)
 	}
 `;
+
+export const ADD_SUBREGION = gql`
+	mutation AddSubRegion($_id: String!){
+		addSubRegion(_id: $_id)
+	}
+`;

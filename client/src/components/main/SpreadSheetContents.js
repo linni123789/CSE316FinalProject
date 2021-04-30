@@ -2,19 +2,7 @@ import React        from 'react';
 import SpreadSheetEntry   from './SpreadSheetEntry';
 
 const SpreadSheetContents = (props) => {
-    let entries = [];
-    let subregionsID = props.activeRegion.subregions;
-    console.log(subregionsID)
-    if (subregionsID !== undefined){
-        subregionsID.forEach((subregionID) => {
-            props.regions.forEach((region) =>{
-                if (subregionID === region._id)
-                    entries.push(region)
-            })
-        }
-        )
-    }
-    console.log(entries);
+    let entries = props.activeSubRegions;
     
     return (
         entries !== undefined && entries.length > 0 ? <div className=' table-entries container-primary'>
@@ -25,7 +13,7 @@ const SpreadSheetContents = (props) => {
                         deleteItem={props.deleteItem} reorderItem={props.reorderItem}
                         editItem={props.editItem}
                         handleSetActive = {props.handleSetActive}
-                        setRegionViewer
+                        setRegionViewer = {props.setRegionViewer}
                     />
                 ))
             }
@@ -33,7 +21,7 @@ const SpreadSheetContents = (props) => {
             </div>
             : <div className='container-primary' >
                 {
-                    props.activeRegion._id ? <h2 className="nothing-msg"> Nothing to do!</h2> : <></> 
+                    props.activeRegion._id ? <h2 className="nothing-msg"> No Regions!</h2> : <></> 
                 }               
                 
             </div>

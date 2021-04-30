@@ -13,6 +13,7 @@ const MapList = (props) => {
                         name={entry.name} _id={entry._id}
                         deleteMap = {props.deleteMap}
                         updateMapName = {props.updateMapName}
+                        handleSetActive = {props.handleSetActive}
                     />
                 ))
             }

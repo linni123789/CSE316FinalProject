@@ -2,7 +2,8 @@ import Logo 							from '../navbar/Logo';
 import Login 							from '../modals/Login';
 import Delete 							from '../modals/Delete';
 import UpdateAccount					from '../modals/UpdateAccount';
-import MainContents 					from '../main/MainContents';
+import Spreadsheet 						from '../main/SpreadSheet';
+import RegionViewer 					from '../regionviewer/RegionViewer.js'
 import Welcome 							from '../main/Welcome';
 import MapContents                      from '../maps/MapContents'
 import CreateAccount 					from '../modals/CreateAccount';
@@ -35,17 +36,21 @@ const Homescreen = (props) => {
 	document.onkeydown = keyCombination;
 
 	const auth = props.user === null ? false : true;
-	let regions	= [];
+	let regions	= []; 
 	let maps = [];
-	let SidebarData = [];
+	let activeSubRegions = [];
+	let parentRegion;
+
 	const [sortRule, setSortRule] = useState('unsorted'); // 1 is ascending, -1 desc
-	const [activeList, setActiveList] 		= useState({});
+	const [activeRegion, setActiveRegion] 		= useState();
+	const [showRegionViewer, toggleShowRegionViewer] = useState(false);
 	const [showDelete, toggleShowDelete] 	= useState(false);
 	const [showLogin, toggleShowLogin] 		= useState(false);
 	const [showCreate, toggleShowCreate] 	= useState(false);
 	const [showUpdate, toggleShowUpdate]    = useState(false);
 	const [showWelcome, toggleWelcome] 		= useState(true);
 	const [showMaps, toggleShowMaps]        = useState(false);
+	const [showSpreadSheet, toggleShowSpreadSheet]  = useState(false);
 	const [canUndo, setCanUndo] = useState(props.tps.hasTransactionToUndo());
 	const [canRedo, setCanRedo] = useState(props.tps.hasTransactionToRedo());
 
@@ -53,59 +58,43 @@ const Homescreen = (props) => {
 	if(loading) { console.log(loading, 'loading'); }
 	if(error) { console.log(error, 'error'); }
 	if(data) {
-		// Assign todolists 
 		for(let region of data.getAllRegions) {
 			regions.push(region)
 			if (region.parentRegion === "none"){
 				maps.push(region)
 			}
 		}
+		if (activeRegion){
+			let subregionsID = activeRegion.subregions;
+			if (subregionsID !== undefined){
+				subregionsID.forEach((subregionID) => {
+					regions.forEach((region) =>{
+						if (subregionID === region._id)
+							activeSubRegions.push(region)
+					})
+				}
+				)
+			}
+			regions.forEach((region) => {
+				if (region._id == activeRegion.parentRegion){
+					parentRegion = region
+				}
+			})
+		}
+	}
+	
+
+	const loadRegion = (region) => {
+		setActiveRegion(region);
+		toggleShowMaps(false);
+		toggleShowSpreadSheet(true);
+		toggleShowRegionViewer(false);
 	}
 
-	// if(loading) { console.log(loading, 'loading'); }
-	// if(error) { console.log(error, 'error'); }
-	// if(data) { 
-	// 	// Assign todolists 
-	// 	for(let todo of data.getAllTodos) {
-	// 		todolists.push(todo)
-	// 	}
-	// 	// if a list is selected, shift it to front of todolists
-	// 	if(activeList._id) {
-	// 		let selectedListIndex = todolists.findIndex(entry => entry._id === activeList._id);
-	// 		let removed = todolists.splice(selectedListIndex, 1);
-	// 		todolists.unshift(removed[0]);
-	// 	}
-	// 	// create data for sidebar links
-	// 	for(let todo of todolists) {
-	// 		if(todo) {
-	// 			SidebarData.push({_id: todo._id, name: todo.name});
-	// 		}	
-	// 	}
-	// }
-
-
-	
-	// // NOTE: might not need to be async
-	// const reloadList = async () => {
-	// 	if (activeList._id) {
-	// 		let tempID = activeList._id;
-	// 		let list = todolists.find(list => list._id === tempID);
-	// 		setActiveList(list);
-	// 	}
-	// }
-
-	// const loadTodoList = (list) => {
-	// 	props.tps.clearAllTransactions();
-	// 	setCanUndo(props.tps.hasTransactionToUndo());
-	// 	setCanRedo(props.tps.hasTransactionToRedo());
-	// 	setActiveList(list);
-
-	// }
-
 	// const mutationOptions = {
-	// 	refetchQueries: [{ query: GET_DB_TODOS }], 
+	// 	refetchQueries: [{ query: GET_DB_REGION }], 
 	// 	awaitRefetchQueries: true,
-	// 	onCompleted: () => reloadList()
+	// 	onCompleted: () => handleSetActive(activeRegion._id)
 	// }
 
 	// const [ReorderTodoItems] 		= useMutation(mutations.REORDER_ITEMS, mutationOptions);
@@ -120,6 +109,7 @@ const Homescreen = (props) => {
 	const[AddMap] = useMutation(mutations.ADD_MAP);
 	const[DeleteMap] = useMutation(mutations.DELETE_MAP);
 	const[UpdateMap] = useMutation(mutations.UPDATE_MAP);
+	const[AddNewSubRegion] = useMutation(mutations.ADD_SUBREGION	);
 
 	
 	const tpsUndo = async () => {
@@ -137,51 +127,6 @@ const Homescreen = (props) => {
 			setCanRedo(props.tps.hasTransactionToRedo());
 		}
 	}
-
-	// const addItem = async () => {
-	// 	let list = activeList;
-	// 	const items = list.items;
-	// 	const newItem = {
-	// 		_id: '',
-	// 		description: 'No Description',
-	// 		due_date: 'No Date',
-	// 		assigned_to: 'No One',
-	// 		completed: false
-	// 	};
-	// 	let opcode = 1;
-	// 	let itemID = newItem._id;
-	// 	let listID = activeList._id;
-	// 	let transaction = new UpdateListItems_Transaction(listID, itemID, newItem, opcode, AddTodoItem, DeleteTodoItem);
-	// 	props.tps.addTransaction(transaction);
-	// 	tpsRedo();
-	// };
-
-	// const deleteItem = async (item, index) => {
-	// 	let listID = activeList._id;
-	// 	let itemID = item._id;
-	// 	let opcode = 0;
-	// 	let itemToDelete = {
-	// 		_id: item._id,
-	// 		description: item.description,
-	// 		due_date: item.due_date,
-	// 		assigned_to: item.assigned_to,
-	// 		completed: item.completed
-	// 	}
-	// 	let transaction = new UpdateListItems_Transaction(listID, itemID, itemToDelete, opcode, AddTodoItem, DeleteTodoItem, index);
-	// 	props.tps.addTransaction(transaction);
-	// 	tpsRedo();
-
-	// };
-
-	// const editItem = async (itemID, field, value, prev) => {
-	// 	let flag = 0;
-	// 	if (field === 'completed') flag = 1;
-	// 	let listID = activeList._id;
-	// 	let transaction = new EditItem_Transaction(listID, itemID, field, prev, value, flag, UpdateTodoItemField);
-	// 	props.tps.addTransaction(transaction);
-	// 	tpsRedo();
-
-	// };
 
 	// const reorderItem = async (itemID, dir) => {
 	// 	let listID = activeList._id;
@@ -218,11 +163,18 @@ const Homescreen = (props) => {
 
 	// };
 
-	// const handleSetActive = (_id) => {
-	// 	const selectedList = todolists.find(todo => todo._id === _id);
-	// 	loadTodoList(selectedList);
-	// };
+	const handleSetActive = (_id) => {
+		const selectedRegion = regions.find(region => region._id === _id);
+		loadRegion(selectedRegion);
+	};
 
+	const setRegionViewer = (_id) => {
+		const selectedRegion = regions.find(region=> region._id === _id);
+		setActiveRegion(selectedRegion);
+		toggleShowSpreadSheet(false);
+		toggleShowRegionViewer(true);
+		
+	}
 	const addMap = async(name) => {
 		let Map = {
 			_id: "",
@@ -234,8 +186,7 @@ const Homescreen = (props) => {
 			landmarks: [],
 			subregions: []
 		}
-		console.log(Map);
-		const{data} = await AddMap({ variables: {region: Map},refetchQueries: [{ query: GET_DB_REGION }]});
+		const{data} = await AddMap({ variables: {region: Map}, refetchQueries: [{ query: GET_DB_REGION }]});
 	}
 
 	const deleteMap = async(id) => {
@@ -243,7 +194,20 @@ const Homescreen = (props) => {
 	}
 
 	const updateMapName = async(_id, name) => {
-		const{data} = await UpdateMap({variables:{_id: _id, name: name},refetchQueries: [{ query: GET_DB_REGION }]});
+		const{data} = await UpdateMap({variables:{_id: _id, name: name}, refetchQueries: [{ query: GET_DB_REGION }]});
+	}
+
+	const addSubRegion = async() => {
+		handleSetActive(activeRegion._id);
+		const{data} = await AddNewSubRegion({variables:{_id: activeRegion._id}, refetchQueries: [{ query: GET_DB_REGION }]});
+		handleSetActive(activeRegion._id);
+	}
+
+	const goHome = () =>{
+		toggleShowMaps(true);
+		toggleShowRegionViewer(false);
+		toggleShowSpreadSheet(false);
+		setActiveRegion(null);
 	}
 
 	const setShowLogin = () => {
@@ -301,52 +265,61 @@ const Homescreen = (props) => {
 							user = {props.user}
 							toggleShowMaps = {toggleShowMaps}
 							toggleWelcome = {toggleWelcome}
+							activeRegion = {activeRegion}
+							goHome = {goHome}
+							setActiveRegion = {setActiveRegion}
+							toggleShowRegionViewer = {toggleShowRegionViewer}
 						/>
 					</ul>
 				</WNavbar>
 			</WLHeader>
 
-			{/* <WLSide side="left">
-				<WSidebar>
-					{
-						activeList ? 
-							<SidebarContents
-								listIDs={SidebarData} 				activeid={activeList._id} auth={auth}
-								handleSetActive={handleSetActive} 	createNewList={createNewList}
-								updateListField={updateListField} 	key={activeList._id}
-							/>
-							:
-							<></>
-					}
-				</WSidebar>
-			</WLSide> */}
-			{/* <WLMain>
+			<WLMain>
 				{
-					activeList ? 
+					activeRegion && showSpreadSheet ? 
 					
 							<div className="container-secondary">
-								<MainContents
-									addItem={addItem} 				deleteItem={deleteItem}
-									editItem={editItem} 			reorderItem={reorderItem}
-									setShowDelete={setShowDelete} 	undo={tpsUndo} redo={tpsRedo}
-									activeList={activeList} 		setActiveList={loadTodoList}
-									canUndo={canUndo} 				canRedo={canRedo}
-									sort={sort}
+								<Spreadsheet
+									setShowDelete={setShowDelete}
+									activeRegion={activeRegion} setActiveList={loadRegion}
+									regions = {regions}
+									addSubRegion={addSubRegion}
+									handleSetActive = {handleSetActive}
+									goHome ={goHome}
+									activeSubRegions = {activeSubRegions}
+									setRegionViewer = {setRegionViewer}
 								/>
 							</div>
 						:
 							<div className="container-secondary" />
 				}
 
-			</WLMain> */}
+			</WLMain>
+			<WLMain>
+				{
+					activeRegion && showRegionViewer ? 
+					
+							<div className="container-secondary">
+								<RegionViewer
+									data = {activeRegion}
+									regions = {regions}
+									handleSetActive = {handleSetActive}
+									parentRegion = {parentRegion}
+								/>
+							</div>
+						:
+							<div className="container-secondary" />
+				}
+
+			</WLMain>
 			{
 				showWelcome && (<Welcome/>)
 			}
 			{
-				showMaps && (<MapContents addMap = {addMap} maps = {maps} deleteMap = {deleteMap} updateMapName = {updateMapName} reloadRegions={refetch}/>)
+				showMaps && (<MapContents addMap = {addMap} handleSetActive = {handleSetActive} maps = {maps} deleteMap = {deleteMap} updateMapName = {updateMapName} reloadRegions={refetch}/>)
 			}
 			{
-				showDelete && (<Delete activeid={activeList._id} setShowDelete={setShowDelete} />)
+				showDelete && (<Delete setShowDelete={setShowDelete} />)
 			}
 
 			{

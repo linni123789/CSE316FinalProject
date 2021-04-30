@@ -12,6 +12,8 @@ const LoggedIn = (props) => {
         const { data } = await props.fetchUser();
         props.toggleWelcome(true);
         props.toggleShowMaps(false);
+        props.setActiveRegion(null);
+        props.toggleShowRegionViewer(false);
         if (data) {
             let reset = await client.resetStore();
             // if (reset) props.setActiveList({});
@@ -24,6 +26,11 @@ const LoggedIn = (props) => {
 
     return (
         <WNavItem hoverAnimation="lighten">
+            {props.activeRegion ? <WButton onClick = {props.goHome} wType="texted">
+                        <i className="material-icons">home</i>
+            </WButton>
+            :<div></div>
+            }
            <WButton className="navbar-options" onClick={handleUpdate} wType="texted" hoverAnimation="text-primary">
                 {props.user.firstName + " "+ props.user.lastName}
             </WButton>
@@ -46,7 +53,7 @@ const LoggedOut = (props) => {
                 <WButton className="navbar-options" onClick={props.setShowCreate} wType="texted" hoverAnimation="text-primary"> 
                     Sign Up 
                 </WButton>
-            </WNavItem>
+            </WNavItem>                    
         </>
     );
 };
@@ -56,8 +63,8 @@ const NavbarOptions = (props) => {
     return (
         <>
             {
-                props.auth === false ? <LoggedOut setShowLogin={props.setShowLogin} setShowCreate={props.setShowCreate} toggleWelcome={props.toggleWelcome}/>
-                : <LoggedIn fetchUser={props.fetchUser} setActiveList={props.setActiveList} logout={props.logout} setShowUpdate = {props.setShowUpdate} user = {props.user} toggleWelcome={props.toggleWelcome} toggleShowMaps = {props.toggleShowMaps}/>
+                props.auth === false ? <LoggedOut setActiveRegion setShowLogin={props.setShowLogin} setShowCreate={props.setShowCreate} toggleWelcome={props.toggleWelcome}/>
+                : <LoggedIn fetchUser={props.fetchUser} toggleShowRegionViewer = {props.toggleShowRegionViewer} setActiveRegion = {props.setActiveRegion} activeRegion ={props.activeRegion} goHome = {props.goHome} logout={props.logout} setShowUpdate = {props.setShowUpdate} user = {props.user} toggleWelcome={props.toggleWelcome} toggleShowMaps = {props.toggleShowMaps}/>
             }
         </>
 
