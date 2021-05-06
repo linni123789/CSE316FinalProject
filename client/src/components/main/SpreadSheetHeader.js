@@ -5,12 +5,12 @@ import { WButton, WRow, WCol } from 'wt-frontend';
 const SpreadSheetHeader = (props) => {
     const clickDisabled = () => { };
     const buttonStyle = props.disabled ? ' table-header-button-disabled ' : 'table-header-button ';
-    
+    console.log(props.canUndo)
     const undoOptions = {
         className: props.disabled || !props.canUndo ? ' table-header-button-disabled ' : 'table-header-button',
         onClick: props.disabled || !props.canUndo  ? clickDisabled : props.undo,
-        wType: "texted", 
-        clickAnimation: props.disabled || !props.canUndo ? "" : "ripple-light",  
+        wType: "texted",  
+        ///clickAnimation: props.disabled || !props.canUndo ? "" : "ripple-light", 
         shape: "rounded"
     }
 
@@ -18,29 +18,29 @@ const SpreadSheetHeader = (props) => {
         className: props.disabled || !props.canRedo ? ' table-header-button-disabled ' : 'table-header-button ',
         onClick: props.disabled || !props.canRedo   ? clickDisabled : props.redo, 
         wType: "texted", 
-        clickAnimation: props.disabled || !props.canRedo ? "" : "ripple-light" ,
+        // clickAnimation: props.disabled || !props.canRedo ? "" : "ripple-light" ,
         shape: "rounded"
     }
 
     return (
         <WRow className="table-header">
             <WCol size="3">
-                <WButton onClick={props.disabled ? () => {} : () => props.sort('task') } className='table-header-section' wType="texted" >Name</WButton>
+                <WButton onClick={props.disabled ? () => {} : () => props.sort('name') } className='table-header-section' wType="texted" >Name</WButton>
             </WCol>
 
             <WCol size="2">
-                <WButton onClick={props.disabled ? () => {} : () => props.sort('due_date') } className='table-header-section' wType="texted">Capital</WButton>
+                <WButton onClick={props.disabled ? () => {} : () => props.sort('capital') } className='table-header-section' wType="texted">Capital</WButton>
             </WCol>
 
             <WCol size="2">
-                <WButton onClick={props.disabled ? () => {} : () => props.sort('status') } className='table-header-section' wType="texted" >Leader</WButton>
+                <WButton onClick={props.disabled ? () => {} : () => props.sort('Leader') } className='table-header-section' wType="texted" >Leader</WButton>
             </WCol>
             <WCol size="2">
-                <WButton onClick={props.disabled ? () => {} : () => props.sort('assigned_to') } className='table-header-section' wType="texted" >Flag</WButton>
+                <WButton className='table-header-section' wType="texted" >Flag</WButton>
             </WCol>
 
             <WCol size="2">
-                <WButton onClick={props.disabled ? () => {} : () => props.sort('assigned_to') } className='table-header-section' wType="texted" >Landmarks</WButton>
+                <WButton className='table-header-section' wType="texted" >Landmarks</WButton>
             </WCol>
 
             <WCol size="1">
