@@ -25,6 +25,9 @@ const typeDefs = gql `
 		deleteSubRegion(_id: String!, parentId: String!): String
 		reAddSubRegion(_id: String!, parentId: String!, index: Int!) : String
 		sortRegion(_id: String!, criteria: String!): String
+		addLandmark(_id: String!, name: String!) :String
+		updateLandmark(_id: String!, index: Int!, name: String!) : String
+		deleteLandmark(_id: String!, index: Int!) : String
 	}
 
 	input RegionInput {

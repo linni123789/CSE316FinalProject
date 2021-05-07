@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { WButton, WInput, WRow, WCol, WLHeader, WLSide, WLFooter, WLayout, WLMain } from 'wt-frontend';
+import LandmarkEntry from './LandmarkEntry';
 
 const RegionViewer = (props) => {
     const { data } = props;
@@ -14,6 +15,11 @@ const RegionViewer = (props) => {
             parentRegion = region;
         }
     })
+    
+    const handleAddLandmark = () => {
+        props.addLandmark(data._id,document.getElementById("landmarkinput").value);
+    }
+
     return (
         <div className='region-viewer'>
             <WRow>
@@ -22,6 +28,22 @@ const RegionViewer = (props) => {
                 </WCol>
                 <WCol size='6'>
                     <h1>Region Landmarks: </h1>
+                    {landmarks.map((entry, index) => (
+                        <LandmarkEntry
+                            name = {entry}
+                            _id = {data._id}
+                            index = {index}
+                            deleteLandmark = {props.deleteLandmark}
+                            updateLandmark = {props.updateLandmark}
+                            
+
+                        />
+                    ))
+                    }
+                    <WInput id= "landmarkinput" type = "text"></WInput>
+                    <WButton id = "addlandmark" onClick = {handleAddLandmark} wType="texted"  clickAnimation={"ripple-light" }>
+                        <i className="material-icons">add_box</i>
+                    </WButton>
                 </WCol>
             </WRow>
             <WRow>

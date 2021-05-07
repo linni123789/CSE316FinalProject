@@ -173,3 +173,22 @@ export const READD_SUBREGION = gql`
 		sortRegion(_id: $_id, criteria: $criteria) 
 	}
 `;
+
+
+export const ADD_LANDMARK= gql`
+mutation AddLandmark($_id: String!, $name: String!) {
+	addLandmark(_id: $_id, name: $name) 
+}
+`;
+
+export const DELETE_LANDMARK= gql`
+mutation DeleteLandmark($_id: String!, $index: Int!) {
+	deleteLandmark(_id: $_id, index: $index) 
+}
+`;
+
+export const UPDATE_LANDMARK= gql`
+mutation UpdateLandmark($_id: String!, $index: Int!, $name: String!) {
+	updateLandmark(_id: $_id, index: $index, name: $name) 
+}
+`;

@@ -24,18 +24,6 @@ const SpreadSheetEntry = (props) => {
     const handleDelete = () => {
         props.deleteSubRegion(data._id, props.activeRegion._id, props.index);
     }
-    // const disabledButton = () => {}
-
-    // const handleDateEdit = (e) => {
-    //     toggleDateEdit(false);
-    //     const newDate = e.target.value ? e.target.value : 'No Date';
-    //     const prevDate = due_date;
-    //     if(newDate !== prevDate) {
-    //         props.editItem(data._id, 'due_date', newDate, prevDate);
-    //     }
-
-    // };
-
     const handleCapitalEdit = (e) => {
         toggleCapitalEdit(false);
         const newCapital = e.target.value ? e.target.value : 'None';
@@ -128,7 +116,7 @@ const SpreadSheetEntry = (props) => {
             <WCol size="1">
                 {
                          <div className="table-text landmark" onClick = {handleRegionViewer}>
-                            none
+                            {landmarks[0]}...
                         </div>
                 }
             </WCol>

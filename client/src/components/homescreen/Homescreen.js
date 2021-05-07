@@ -115,6 +115,9 @@ const Homescreen = (props) => {
 	const[DeleteSubRegion] = useMutation(mutations.DELETE_SUBREGION,mutationOptions);
 	const[ReAddSubRegion] = useMutation(mutations.READD_SUBREGION,mutationOptions);
 	const[SortRegion] = useMutation(mutations.SORT_REGION, mutationOptions);
+	const[AddLandmark] = useMutation(mutations.ADD_LANDMARK, mutationOptions);
+	const[DeleteLandmark] = useMutation(mutations.DELETE_LANDMARK, mutationOptions);
+	const[UpdateLandmark] = useMutation(mutations.UPDATE_LANDMARK, mutationOptions);
 
 	
 	const tpsUndo = async () => {
@@ -261,13 +264,22 @@ const Homescreen = (props) => {
 	};
 
 	const sort = (criteria) => {
-		let prevSortRule = sortRule;
-		setSortRule(criteria);
-		let transaction = new SortRegion_Transaction(activeRegion._id, criteria, prevSortRule, SortRegion);
-		console.log(transaction)
+		let transaction = new SortRegion_Transaction(activeRegion._id, criteria, SortRegion);
 		props.tps.addTransaction(transaction);
 		tpsRedo();
 		
+	}
+
+	const addLandmark = async(_id, landmarkname) => {
+		const {data}  = await AddLandmark({variables:{_id: _id, name : landmarkname}});
+	}
+	
+	const deleteLandmark = async(_id, index) => {
+		const {data}  = await DeleteLandmark({variables:{_id: _id, index : index}});
+	}
+
+	const updateLandmark = async(_id, index, name) => {
+		const {data}  = await UpdateLandmark({variables:{_id: _id, index : index, name : name}});
 	}
 
 	return (
@@ -335,6 +347,9 @@ const Homescreen = (props) => {
 									regions = {regions}
 									handleSetActive = {handleSetActive}
 									parentRegion = {parentRegion}
+									addLandmark = {addLandmark}
+									updateLandmark = {updateLandmark}
+									deleteLandmark = {deleteLandmark}
 								/>
 							</div>
 						:

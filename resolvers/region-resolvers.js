@@ -163,6 +163,31 @@ module.exports = {
 			const updated = await Region.updateOne({_id: regionId}, {subregions: updatedsubregions});
 			return "done";
 
+		},
+		addLandmark: async(_,args) => {
+			const{_id, name} = args;
+			const regionID = new ObjectId(_id);
+			const found = await Region.findOne({_id: regionID});
+			found.landmarks.push(name);
+			const updated = await Region.updateOne({_id:regionID}, {landmarks: found.landmarks});
+			return "done";
+		},
+		updateLandmark: async(_,args) => {
+			const{_id, index, name} = args;
+			const regionID = new ObjectId(_id);
+			const found = await Region.findOne({_id: regionID});
+			found.landmarks[index] = name;
+			const updated = await Region.updateOne({_id:regionID}, {landmarks: found.landmarks});
+			return "done";
+
+		},
+		deleteLandmark: async(_,args) => {
+			const{_id, index} = args;
+			const regionID = new ObjectId(_id);
+			const found = await Region.findOne({_id: regionID});
+			found.landmarks.splice(index,1);
+			const updated = await Region.updateOne({_id:regionID}, {landmarks: found.landmarks});
+			return "done";
 		}
 
 }

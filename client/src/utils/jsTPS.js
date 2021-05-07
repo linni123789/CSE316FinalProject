@@ -71,15 +71,14 @@ export class ReorderItems_Transaction extends jsTPS_Transaction {
 }
 
 export class SortRegion_Transaction extends jsTPS_Transaction{
-    constructor(regionID, nextSortRule, prevSortRule, callback) {
+    constructor(regionID, criteria, callback) {
         super();
         this.regionID = regionID;
-        this.nextSortRule = nextSortRule;
-        this.prevSortRule = prevSortRule;
+        this.criteria = criteria;
         this.updateFunction = callback;
     }
     async doTransaction() {
-		const { data } = await this.updateFunction({ variables: { _id: this.regionID, criteria: this.nextSortRule}});
+		const { data } = await this.updateFunction({ variables: { _id: this.regionID, criteria: this.criteria}});
         if(data) {
             console.log(data)
             return data;
@@ -88,7 +87,7 @@ export class SortRegion_Transaction extends jsTPS_Transaction{
     }
 
     async undoTransaction() {
-		const { data } = await this.updateFunction({ variables: { _id: this.listID, criteria: this.prevSortRule}});
+		const { data } = await this.updateFunction({ variables: { _id: this.regionID, criteria: this.criteria}});
         if(data) {
             console.log(data)
             return data;
