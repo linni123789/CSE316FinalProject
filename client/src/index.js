@@ -1,5 +1,6 @@
 import './css/style.scss';
 import './css/layout.scss';
+import './css/regionviewerstyle.scss';
 import React 	from 'react';
 import ReactDOM from 'react-dom';
 import App 		from './App';

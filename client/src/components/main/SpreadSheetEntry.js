@@ -15,12 +15,14 @@ const SpreadSheetEntry = (props) => {
     // const canMoveDown = props.index < props.entryCount-1 ? true : false;
     
     const [editingName, toggleDateEdit] = useState(false);
-    const [editingCapital, toggleDescrEdit] = useState(false);
-    const [editingLeader, toggleStatusEdit] = useState(false);
+    const [editingCapital, toggleCapitalEdit] = useState(false);
+    const [editingLeader, toggleLeaderEdit] = useState(false);
     const [editingAssigned, toggleAssignEdit] = useState(false);
-
     const handleRegionViewer = () => {
         props.setRegionViewer(data._id);
+    }
+    const handleDelete = () => {
+        props.deleteSubRegion(data._id, props.activeRegion._id, props.index);
     }
     // const disabledButton = () => {}
 
@@ -34,14 +36,23 @@ const SpreadSheetEntry = (props) => {
 
     // };
 
-    // const handleDescrEdit = (e) => {
-    //     toggleDescrEdit(false);
-    //     const newDescr = e.target.value ? e.target.value : 'No Description';
-    //     const prevDescr = description;
-    //     if(newDescr !== prevDescr) {
-    //         props.editItem(data._id, 'description', newDescr, prevDescr);
-    //     }
-    // };
+    const handleCapitalEdit = (e) => {
+        toggleCapitalEdit(false);
+        const newCapital = e.target.value ? e.target.value : 'None';
+        const prevCapital = capital;
+        if(newCapital !== prevCapital) {
+            props.editSubRegion(data._id, 'capital', newCapital, prevCapital);
+        }
+    };
+
+    const handleLeaderEdit = (e) => {
+        toggleLeaderEdit(false);
+        const newLeader = e.target.value ? e.target.value : 'None';
+        const prevLeader = leader;
+        if(newLeader !== prevLeader) {
+            props.editSubRegion(data._id, 'leader', newLeader, prevLeader);
+        }
+    };
 
     // const handleStatusEdit = (e) => {
     //     toggleStatusEdit(false);
@@ -63,7 +74,7 @@ const SpreadSheetEntry = (props) => {
 
     return (
         <WRow className='table-entry'>
-            <WCol size="3">
+            <WCol size="3"> 
                 {
                     // editingDescr || description === ''
                     //     ? <WInput
@@ -79,26 +90,23 @@ const SpreadSheetEntry = (props) => {
 
             <WCol size="2">
                 {
-                    // editingDate ? <WInput
-                    //     className='table-input'
-                    //     autoFocus={true} defaultValue={due_date} type='date'
-                    //     wtype="outlined" baranimation="solid" inputclass="table-input-class"
-                    // />
-                         <div className="table-text">{capital}
-                        </div>
+                    editingCapital ? <WInput
+                            className='table-input' onBlur={handleCapitalEdit}
+                            autoFocus={true} defaultValue={capital} type='text'
+                            inputClass="table-input-class"/>
+                        :
+                         <div className="table-text" onClick = {() => toggleCapitalEdit(true)}>{capital}</div>
                 }
             </WCol>
 
             <WCol size="2">
                 {
-                    // editingStatus ? <select
-                    //     className='table-select'
-                    //     autoFocus={true} 
-                    // >
-                    //     <option value="complete">complete</option>
-                    //     <option value="incomplete">incomplete</option>
-                    // </select>
-                         <div className="table-text">
+                    editingLeader ? <WInput
+                    className='table-input' onBlur={handleLeaderEdit}
+                    autoFocus={true} defaultValue={leader} type='text'
+                    inputClass="table-input-class"/>
+                :
+                         <div className="table-text" onClick = {()=> toggleLeaderEdit(true)}>
                             {leader}
                         </div>
                 }
@@ -117,14 +125,21 @@ const SpreadSheetEntry = (props) => {
                         </div>
                 }
             </WCol>
-            <WCol size="2">
+            <WCol size="1">
                 {
-                         <div className="table-text">
+                         <div className="table-text landmark" onClick = {handleRegionViewer}>
                             none
                         </div>
                 }
             </WCol>
-            <WCol size="1">
+            <WCol size=".5">
+                {
+                    <WButton  wType="texted" onClick = {handleDelete}>
+                         <i className="material-icons">delete</i>
+                    </WButton>
+                }
+            </WCol>
+            <WCol size=".5">
                 {
                     <WButton  wType="texted" onClick = {handleRegionViewer}>
                          <i className="material-icons">subject</i>

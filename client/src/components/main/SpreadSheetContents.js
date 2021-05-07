@@ -14,6 +14,9 @@ const SpreadSheetContents = (props) => {
                         editItem={props.editItem}
                         handleSetActive = {props.handleSetActive}
                         setRegionViewer = {props.setRegionViewer}
+                        editSubRegion ={props.editSubRegion}
+                        deleteSubRegion = {props.deleteSubRegion}
+                        activeRegion = {props.activeRegion}
                     />
                 ))
             }

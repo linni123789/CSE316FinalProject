@@ -63,8 +63,8 @@ module.exports = {
 			let newSubRegion = new Region({
 				_id: newRegionID,
 				owner: parentRegion.owner,
-				capital: "None",
-				leader: "None",
+				capital: "none",
+				leader: "none",
 				name: "Untitled",
 				parentRegion: _id,
 				landmarks: [],
@@ -105,28 +105,63 @@ module.exports = {
 			const { _id, criteria } = args;
 			const regionId = new ObjectId(_id);
 			const found = await Region.findOne({_id: regionId});
-			let subregions = found.subregions;
-			subregions.forEach((subregionId) =>
-			
-			)
+			let subregionIDs = found.subregions;
+			let subregions = [];
+			let reverseSort = true;
+			for (subregionId of subregionIDs){
+				const found = await Region.findOne({_id: subregionId});
+				subregions.push(found);
+			}
 			switch(criteria) {
 				case 'name':
-					if (subregions != subregions.sort(a,b => a.name.toUpperCase() > b.name.toUpperCase ? 1 : -1)){
-						sortedsubregions = subregions.sort(a,b => a.name.toUpperCase() > b.name.toUpperCase ? 1 : -1);
+					for (var i = 0 ; i < subregions.length-1 ; i++){
+						if (subregions[i].name > subregions[i+1].name){
+							reverseSort = false;
+							break;
+						}
+					}
+					if (reverseSort){
+						subregions.sort((a,b) => a.name.toUpperCase() <= b.name.toUpperCase() ? 1 : -1);
 					}
 					else{
-						sortedsubregions = subregions.sort(a,b => a.name.toUpperCase() < b.name.toUpperCase ? 1 : -1);
+						subregions.sort((a,b) => a.name.toUpperCase() >= b.name.toUpperCase() ? 1 : -1)
 					}
 					break;
 				case 'capital':
-					sortedItems = Sorting.byDueDate(found.items, newDirection);
+					for (var i = 0 ; i < subregions.length-1 ; i++){
+						if (subregions[i].capital > subregions[i+1].capital){
+							reverseSort = false;
+							break;
+						}
+					}
+					if (reverseSort){
+						subregions.sort((a,b) => a.capital.toUpperCase() <= b.capital.toUpperCase() ? 1 : -1);
+					}
+					else{
+						subregions.sort((a,b) => a.capital.toUpperCase() >= b.capital.toUpperCase() ? 1 : -1)
+					}
 					break;
 				case 'leader':
-					sortedItems = Sorting.byStatus(found.items, newDirection);
+					for (var i = 0 ; i < subregions.length-1 ; i++){
+						if (subregions[i].leader > subregions[i+1].leader){
+							reverseSort = false;
+							break;
+						}
+					}
+					if (reverseSort){
+						subregions.sort((a,b) => a.leader.toUpperCase() <= b.leader.toUpperCase() ? 1 : -1);
+					}
+					else{
+						subregions.sort((a,b) => a.leader.toUpperCase() >= b.leader.toUpperCase() ? 1 : -1)
+					}
 					break;
-				}
-			const updated = await Region.updateOne({_id: regionId}, {subregions: sortedsubregions});
-			return "done"
+			}
+			let updatedsubregions = [];
+			for (subregion of subregions){
+				updatedsubregions.push(subregion._id);
+			}
+			const updated = await Region.updateOne({_id: regionId}, {subregions: updatedsubregions});
+			return "done";
 
 		}
 

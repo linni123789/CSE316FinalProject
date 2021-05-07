@@ -33,7 +33,7 @@ const SpreadSheetHeader = (props) => {
             </WCol>
 
             <WCol size="2">
-                <WButton onClick={props.disabled ? () => {} : () => props.sort('Leader') } className='table-header-section' wType="texted" >Leader</WButton>
+                <WButton onClick={props.disabled ? () => {} : () => props.sort('leader') } className='table-header-section' wType="texted" >Leader</WButton>
             </WCol>
             <WCol size="2">
                 <WButton className='table-header-section' wType="texted" >Flag</WButton>

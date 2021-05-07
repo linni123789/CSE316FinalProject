@@ -5,7 +5,7 @@ export class jsTPS_Transaction {
     undoTransaction () {};
 }
 /*  Handles list name changes, or any other top level details of a todolist that may be added   */
-export class UpdateListField_Transaction extends jsTPS_Transaction {
+export class UpdateSubRegionField_Transaction extends jsTPS_Transaction {
     constructor(_id, field, prev, update, callback) {
         super();
         this.prev = prev;
@@ -23,6 +23,28 @@ export class UpdateListField_Transaction extends jsTPS_Transaction {
 		return data;
     }
 }
+
+
+export class DeleteSubRegion_Transaction extends jsTPS_Transaction {
+    constructor(_id, parentId, index, callback, undocallback) {
+        super();
+        this._id = _id;
+        this.index = index;
+        this.parentId = parentId;
+        this.updateFunction = callback;
+        this.undocallback = undocallback;
+
+    }
+    async doTransaction() {
+		const { data } = await this.updateFunction({ variables: { _id: this._id, parentId: this.parentId}});
+		return data;
+    }
+    async undoTransaction() {
+        const { data } = await this.undocallback({ variables: { _id: this._id, parentId: this.parentId, index: this.index}});
+		return data;
+    }
+}
+
 
 /*  Handles item reordering */
 export class ReorderItems_Transaction extends jsTPS_Transaction {
@@ -48,16 +70,16 @@ export class ReorderItems_Transaction extends jsTPS_Transaction {
     
 }
 
-export class SortItems_Transaction extends jsTPS_Transaction{
-    constructor(listID, nextSortRule, prevSortRule, callback) {
+export class SortRegion_Transaction extends jsTPS_Transaction{
+    constructor(regionID, nextSortRule, prevSortRule, callback) {
         super();
-        this.listID = listID;
+        this.regionID = regionID;
         this.nextSortRule = nextSortRule;
         this.prevSortRule = prevSortRule;
         this.updateFunction = callback;
     }
     async doTransaction() {
-		const { data } = await this.updateFunction({ variables: { _id: this.listID, criteria: this.nextSortRule}});
+		const { data } = await this.updateFunction({ variables: { _id: this.regionID, criteria: this.nextSortRule}});
         if(data) {
             console.log(data)
             return data;

@@ -148,8 +148,11 @@ html, body {
 }
 
 .table-entry {
-    border-bottom: 1px solid;
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
     color: $text-color;
+
     transition: 0.05s ease-in-out;
     height: 46px;
 }
@@ -235,4 +238,13 @@ html, body {
 
 .table-entry-buttons{
     color:black;
+}
+
+.leftregionviewer{
+    background-color:white;
+    height: 50%;
+}
+
+.landmark{
+    color:lightblue;
 }

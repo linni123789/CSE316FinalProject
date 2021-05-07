@@ -148,3 +148,28 @@ export const ADD_SUBREGION = gql`
 		addSubRegion(_id: $_id)
 	}
 `;
+
+export const UPDATE_FIELD = gql`
+	mutation UpdateField($_id: String!, $field: String!, $value: String!){
+		updateField(_id: $_id, field: $field, value: $value)
+	}
+`;
+
+export const DELETE_SUBREGION = gql`
+	mutation DeleteSubregion($_id: String!, $parentId: String!){
+		deleteSubRegion(_id: $_id, parentId: $parentId)
+	}
+`;
+
+export const READD_SUBREGION = gql`
+	mutation ReAddSubRegion($_id: String!, $parentId: String!, $index: Int!){
+		reAddSubRegion(_id: $_id, parentId: $parentId, index: $index)
+	}
+ `;
+
+
+ export const SORT_REGION = gql`
+	mutation SortRegion($_id: String!, $criteria: String!) {
+		sortRegion(_id: $_id, criteria: $criteria) 
+	}
+`;

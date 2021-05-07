@@ -14,10 +14,10 @@ import React, { useState } 				from 'react';
 import { useMutation, useQuery } 		from '@apollo/client';
 import { WNavbar, WSidebar, WNavItem } 	from 'wt-frontend';
 import { WLayout, WLHeader, WLMain, WLSide } from 'wt-frontend';
-import { UpdateListField_Transaction, 
-	SortItems_Transaction,
+import { UpdateSubRegionField_Transaction, 
+	DeleteSubRegion_Transaction,
 	UpdateListItems_Transaction, 
-	ReorderItems_Transaction, 
+	SortRegion_Transaction, 
 	EditItem_Transaction } 				from '../../utils/jsTPS';
 
 const Homescreen = (props) => {
@@ -42,7 +42,7 @@ const Homescreen = (props) => {
 	let parentRegion;
 
 	const [sortRule, setSortRule] = useState('unsorted'); // 1 is ascending, -1 desc
-	const [activeRegion, setActiveRegion] 		= useState();
+	const [activeRegion, setActiveRegion] 		= useState({});
 	const [showRegionViewer, toggleShowRegionViewer] = useState(false);
 	const [showDelete, toggleShowDelete] 	= useState(false);
 	const [showLogin, toggleShowLogin] 		= useState(false);
@@ -54,13 +54,14 @@ const Homescreen = (props) => {
 	const [canUndo, setCanUndo] = useState(props.tps.hasTransactionToUndo());
 	const [canRedo, setCanRedo] = useState(props.tps.hasTransactionToRedo());
 
+
 	const { loading, error, data, refetch } = useQuery(GET_DB_REGION);
 	if(loading) { console.log(loading, 'loading'); }
 	if(error) { console.log(error, 'error'); }
 	if(data) {
 		for(let region of data.getAllRegions) {
 			regions.push(region)
-			if (region.parentRegion === "none"){
+			if (region.parentRegion === "None"){
 				maps.push(region)
 			}
 		}
@@ -91,11 +92,11 @@ const Homescreen = (props) => {
 		toggleShowRegionViewer(false);
 	}
 
-	// const mutationOptions = {
-	// 	refetchQueries: [{ query: GET_DB_REGION }], 
-	// 	awaitRefetchQueries: true,
-	// 	onCompleted: () => handleSetActive(activeRegion._id)
-	// }
+	const mutationOptions = {
+		refetchQueries: [{ query: GET_DB_REGION }], 
+		awaitRefetchQueries: true,
+		onCompleted: () => reloadRegion()
+	}
 
 	// const [ReorderTodoItems] 		= useMutation(mutations.REORDER_ITEMS, mutationOptions);
 	// const [sortTodoItems] 		= useMutation(mutations.SORT_ITEMS, mutationOptions);
@@ -109,7 +110,11 @@ const Homescreen = (props) => {
 	const[AddMap] = useMutation(mutations.ADD_MAP);
 	const[DeleteMap] = useMutation(mutations.DELETE_MAP);
 	const[UpdateMap] = useMutation(mutations.UPDATE_MAP);
-	const[AddNewSubRegion] = useMutation(mutations.ADD_SUBREGION	);
+	const[AddNewSubRegion] = useMutation(mutations.ADD_SUBREGION, mutationOptions);
+	const[UpdateSubRegionField] = useMutation(mutations.UPDATE_FIELD, mutationOptions);
+	const[DeleteSubRegion] = useMutation(mutations.DELETE_SUBREGION,mutationOptions);
+	const[ReAddSubRegion] = useMutation(mutations.READD_SUBREGION,mutationOptions);
+	const[SortRegion] = useMutation(mutations.SORT_REGION, mutationOptions);
 
 	
 	const tpsUndo = async () => {
@@ -162,12 +167,24 @@ const Homescreen = (props) => {
 	// 	tpsRedo();
 
 	// };
+	const editSubRegion = async (_id, field, value, prev) => {
+		let transaction = new UpdateSubRegionField_Transaction(_id,field,prev,value,UpdateSubRegionField);
+		props.tps.addTransaction(transaction);
+		tpsRedo();
+	}
 
 	const handleSetActive = (_id) => {
 		const selectedRegion = regions.find(region => region._id === _id);
 		loadRegion(selectedRegion);
 	};
 
+	const reloadRegion = async () => {
+        if(activeRegion._id){
+            let tempID = activeRegion._id;
+            let region = regions.find(region => region._id === tempID);
+            setActiveRegion(region);
+        }
+    }
 	const setRegionViewer = (_id) => {
 		const selectedRegion = regions.find(region=> region._id === _id);
 		setActiveRegion(selectedRegion);
@@ -179,10 +196,10 @@ const Homescreen = (props) => {
 		let Map = {
 			_id: "",
 			owner: props.user._id,
-			capital: "none",
-			leader: "none",
+			capital: "None",
+			leader: "None",
 			name: name,
-			parentRegion: "none",
+			parentRegion: "None",
 			landmarks: [],
 			subregions: []
 		}
@@ -198,9 +215,14 @@ const Homescreen = (props) => {
 	}
 
 	const addSubRegion = async() => {
-		handleSetActive(activeRegion._id);
 		const{data} = await AddNewSubRegion({variables:{_id: activeRegion._id}, refetchQueries: [{ query: GET_DB_REGION }]});
-		handleSetActive(activeRegion._id);
+	}
+
+	const deleteSubRegion = async(_id, parentid, index) => {
+		let transaction = new DeleteSubRegion_Transaction(_id, parentid, index, DeleteSubRegion, ReAddSubRegion);
+		props.tps.addTransaction(transaction);
+		tpsRedo();
+
 	}
 
 	const goHome = () =>{
@@ -238,15 +260,15 @@ const Homescreen = (props) => {
 		toggleShowUpdate(!showUpdate);
 	};
 
-	// const sort = (criteria) => {
-	// 	let prevSortRule = sortRule;
-	// 	setSortRule(criteria);
-	// 	let transaction = new SortItems_Transaction(activeList._id, criteria, prevSortRule, sortTodoItems);
-	// 	console.log(transaction)
-	// 	props.tps.addTransaction(transaction);
-	// 	tpsRedo();
+	const sort = (criteria) => {
+		let prevSortRule = sortRule;
+		setSortRule(criteria);
+		let transaction = new SortRegion_Transaction(activeRegion._id, criteria, prevSortRule, SortRegion);
+		console.log(transaction)
+		props.tps.addTransaction(transaction);
+		tpsRedo();
 		
-	// }
+	}
 
 	return (
 		<WLayout wLayout="header-lside">
@@ -254,7 +276,8 @@ const Homescreen = (props) => {
 				<WNavbar color="colored">
 					<ul>
 						<WNavItem>
-							<Logo className='logo' />
+							<Logo className='logo' goHome={goHome}/>
+
 						</WNavItem>
 					</ul>
 					<ul>
@@ -288,6 +311,13 @@ const Homescreen = (props) => {
 									goHome ={goHome}
 									activeSubRegions = {activeSubRegions}
 									setRegionViewer = {setRegionViewer}
+									editSubRegion = {editSubRegion}
+									canUndo = {canUndo}
+									canRedo = {canRedo}
+									undo = {tpsUndo}
+									redo = {tpsRedo}
+									deleteSubRegion = {deleteSubRegion}
+									sort = {sort}
 								/>
 							</div>
 						:

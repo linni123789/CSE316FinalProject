@@ -5,7 +5,6 @@ const MapEntry = (props) => {
     const [editing, toggleEditing] = useState(false);
     const [preEdit, setPreEdit] = useState(props.name);
     const handleEditing = (e) => {
-        console.log(props._id);
         e.stopPropagation();
         setPreEdit(props.name);
         toggleEditing(!editing);
@@ -27,9 +26,9 @@ const MapEntry = (props) => {
                             />
                         :      
                             <div>
-                            <div onClick={() => { props.handleSetActive(props._id) }} >
-                                {props.name}
-                            </div>
+                                <div onClick={() => { props.handleSetActive(props._id) }} >
+                                    {props.name}
+                                </div>
                                 <WButton className="table-entry-buttons" onClick={() => props.deleteMap(props._id)} wType="texted">
                                     <i className="material-icons">close</i>
                                 </WButton>
