@@ -5,7 +5,6 @@ import { WButton, WRow, WCol } from 'wt-frontend';
 const SpreadSheetHeader = (props) => {
     const clickDisabled = () => { };
     const buttonStyle = props.disabled ? ' table-header-button-disabled ' : 'table-header-button ';
-    console.log(props.canUndo)
     const undoOptions = {
         className: props.disabled || !props.canUndo ? ' table-header-button-disabled ' : 'table-header-button',
         onClick: props.disabled || !props.canUndo  ? clickDisabled : props.undo,
@@ -54,12 +53,6 @@ const SpreadSheetHeader = (props) => {
                     <WButton onClick={props.addSubRegion} wType="texted" className={`${buttonStyle}`} clickAnimation={props.disabled ? "" : "ripple-light" }>
                         <i className="material-icons">add_box</i>
                     </WButton>
-                    {/* <WButton onClick={props.disabled ? clickDisabled : props.setShowDelete} wType="texted" className={`${buttonStyle}`} clickAnimation={props.disabled ? "" : "ripple-light" }>
-                        <i className="material-icons">delete_outline</i>
-                    </WButton>
-                    <WButton onClick={props.disabled ? clickDisabled : () => props.setActiveList({})} wType="texted" className={`${buttonStyle}`} clickAnimation={props.disabled ? "" : "ripple-light" }>
-                        <i className="material-icons">close</i>
-                    </WButton> */}
                 </div>
             </WCol>
 
