@@ -23,9 +23,37 @@ const LoggedIn = (props) => {
     const handleUpdate = async() => {
         props.setShowUpdate();
     }
+    
+    const handleLeftRegion = async() => {
+        const parentRegion = props.parentRegion;
+        const subregions = parentRegion.subregions;
+        let index = subregions.indexOf(props.activeRegion._id);
+        if (index != 0) {
+            props.setRegionViewer(subregions[index-1]);
+        }
+    }
 
+    const handleRightRegion = async() => {
+        const parentRegion = props.parentRegion;
+        const subregions = parentRegion.subregions;
+        let index = subregions.indexOf(props.activeRegion._id);
+        if (index != subregions.length-1) {
+            props.setRegionViewer(subregions[index+1]);
+        }
+    }
+    console.log(props.showRegionViewer);
     return (
         <WNavItem hoverAnimation="lighten">
+            {props.showRegionViewer ? <WButton wType="texted" onClick = {handleLeftRegion}>
+                        <i className="material-icons">arrow_backward</i>
+            </WButton>
+            :<div></div>
+            }
+            {props.showRegionViewer ? <WButton wType="texted" onClick = {handleRightRegion}>
+                        <i className="material-icons">arrow_forward</i>
+            </WButton>
+            :<div></div>
+            }
             {props.activeRegion ? <WButton onClick = {props.goHome} wType="texted">
                         <i className="material-icons">home</i>
             </WButton>
@@ -64,7 +92,21 @@ const NavbarOptions = (props) => {
         <>
             {
                 props.auth === false ? <LoggedOut setActiveRegion setShowLogin={props.setShowLogin} setShowCreate={props.setShowCreate} toggleWelcome={props.toggleWelcome}/>
-                : <LoggedIn fetchUser={props.fetchUser} toggleShowRegionViewer = {props.toggleShowRegionViewer} setActiveRegion = {props.setActiveRegion} activeRegion ={props.activeRegion} goHome = {props.goHome} logout={props.logout} setShowUpdate = {props.setShowUpdate} user = {props.user} toggleWelcome={props.toggleWelcome} toggleShowMaps = {props.toggleShowMaps}/>
+                : <LoggedIn fetchUser={props.fetchUser} 
+                parentRegion = {props.parentRegion}
+                activeRegion = {props.activeRegion}
+                handleRegionViewer = {props.handleRegionViewer}
+                setRegionViewer = {props.setRegionViewer} 
+                toggleShowRegionViewer = {props.toggleShowRegionViewer} 
+                setActiveRegion = {props.setActiveRegion} 
+                activeRegion ={props.activeRegion} 
+                goHome = {props.goHome} 
+                logout={props.logout} 
+                setShowUpdate = {props.setShowUpdate} 
+                user = {props.user} 
+                showRegionViewer = {props.showRegionViewer}
+                toggleWelcome={props.toggleWelcome} 
+                toggleShowMaps = {props.toggleShowMaps}/>
             }
         </>
 

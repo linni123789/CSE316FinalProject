@@ -304,6 +304,10 @@ const Homescreen = (props) => {
 							goHome = {goHome}
 							setActiveRegion = {setActiveRegion}
 							toggleShowRegionViewer = {toggleShowRegionViewer}
+							showRegionViewer = {showRegionViewer}
+							parentRegion = {parentRegion}
+							activeRegion = {activeRegion}
+							setRegionViewer = {setRegionViewer}
 						/>
 					</ul>
 				</WNavbar>
