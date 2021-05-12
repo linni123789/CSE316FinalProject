@@ -61,7 +61,6 @@ const SpreadSheetEntry = (props) => {
             }, 200)
         }else if (event.detail === 2){
            toggleNameEdit(!editingName)
-           console.log("hello");
         }
     }
 
