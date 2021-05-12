@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { WButton, WInput, WRow, WCol } from 'wt-frontend';
+import { WCol, WRow, WNavItem, WInput, WModal, WMHeader, WMMain, WButton  } from 'wt-frontend';
 
 const SpreadSheetEntry = (props) => {
     const { data } = props;
     // const completeStyle = data.completed ? ' complete-task' : ' incomplete-task';
     // const assignedToStyle = data.completed ? 'complete-task-assignedTo' : 'incomplete-task-assignedTo';
-
+    var timer = 0;
     const name = data.name;
     const capital = data.capital;
     const leader = data.leader;
@@ -14,7 +14,7 @@ const SpreadSheetEntry = (props) => {
     // const canMoveUp = props.index > 0 ? true : false;
     // const canMoveDown = props.index < props.entryCount-1 ? true : false;
     
-    const [editingName, toggleDateEdit] = useState(false);
+    const [editingName, toggleNameEdit] = useState(false);
     const [editingCapital, toggleCapitalEdit] = useState(false);
     const [editingLeader, toggleLeaderEdit] = useState(false);
     const [editingAssigned, toggleAssignEdit] = useState(false);
@@ -23,7 +23,17 @@ const SpreadSheetEntry = (props) => {
     }
     const handleDelete = () => {
         props.deleteSubRegion(data._id, props.activeRegion._id, props.index);
+        props.toggleRegionDelete(false);
     }
+
+    const handleNameEdit = (e) => {
+        toggleNameEdit(false);
+        const newName = e.target.value ? e.target.value : 'None';
+        const prevName = name;
+        if(newName !== prevName) {
+            props.editSubRegion(data._id, 'name', newName, prevName);
+        }
+    };
     const handleCapitalEdit = (e) => {
         toggleCapitalEdit(false);
         const newCapital = e.target.value ? e.target.value : 'None';
@@ -42,35 +52,31 @@ const SpreadSheetEntry = (props) => {
         }
     };
 
-    // const handleStatusEdit = (e) => {
-    //     toggleStatusEdit(false);
-    //     const newStatus = e.target.value ? e.target.value : false;
-    //     const prevStatus = status;
-    //     if(newStatus !== prevStatus) {
-    //         props.editItem(data._id, 'completed', newStatus, prevStatus);
-    //     }
-    // };
 
-    // const handleAssignEdit = (e) => {
-    //     toggleAssignEdit(false);
-    //     const newAssigned = e.target.value ? e.target.value : 'Myself';
-    //     const prevAssigned = assigned_to;
-    //     if(newAssigned !== prevAssigned) {
-    //         props.editItem(data._id, 'assigned_to', newAssigned, prevAssigned);
-    //     }
-    // }
+    const handleClick = (event) =>{
+        clearTimeout(timer);
+        if(event.detail === 1){
+            timer = setTimeout(()=>{
+                props.handleSetActive(props.data._id)
+            }, 200)
+        }else if (event.detail === 2){
+           toggleNameEdit(!editingName)
+           console.log("hello");
+        }
+    }
 
     return (
         <WRow className='table-entry'>
             <WCol size="3"> 
                 {
-                    // editingDescr || description === ''
-                    //     ? <WInput
-                    //         className='table-input' onBlur={handleDescrEdit}
-                    //         autoFocus={true} defaultValue={description} type='text'
-                    //         inputClass="table-input-class"
-                    //     />
-                        <div className="table-text" onClick = {() => props.handleSetActive(props.data._id)}
+                    editingName
+                        ? <WInput
+                            className='table-input' onBlur={handleNameEdit}
+                            autoFocus={true} defaultValue={name} type='text'
+                            inputClass="table-input-class"
+                           />
+                           :
+                        <div className="table-text" onClick = {handleClick}
                         >{name}
                         </div>
                 }
@@ -122,7 +128,7 @@ const SpreadSheetEntry = (props) => {
             </WCol>
             <WCol size=".5">
                 {
-                    <WButton  wType="texted" onClick = {handleDelete}>
+                    <WButton  wType="texted" onClick = {() => props.toggleRegionDelete(true)}>
                          <i className="material-icons">delete</i>
                     </WButton>
                 }
@@ -134,6 +140,23 @@ const SpreadSheetEntry = (props) => {
                     </WButton>
                 }
             </WCol>
+            { 
+                <WModal className="delete-modal" cover="true" visible={props.showRegionDelete}>
+                <WMHeader  className="modal-header" onClose={() => props.toggleRegionDelete(false)}>
+                    Delete {name}?
+                </WMHeader >
+
+                <WMMain>
+                    <WButton className="modal-button cancel-button" onClick={() => props.toggleRegionDelete(false)} wType="texted">
+                        Cancel
+                    </WButton>
+                    <label className="col-spacer">&nbsp;</label>
+                    <WButton className="modal-button" onClick={handleDelete} clickAnimation="ripple-light" hoverAnimation="darken" shape="rounded" color="danger">
+                        Delete
+                    </WButton>
+                </WMMain>
+
+            </WModal >}
         </WRow>
     );
 };

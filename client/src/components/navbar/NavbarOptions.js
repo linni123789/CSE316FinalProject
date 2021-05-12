@@ -30,6 +30,9 @@ const LoggedIn = (props) => {
         let index = subregions.indexOf(props.activeRegion._id);
         if (index != 0) {
             props.setRegionViewer(subregions[index-1]);
+            props.tps.clearAllTransactions();
+            props.setCanUndo(props.tps.hasTransactionToUndo());
+            props.setCanRedo(props.tps.hasTransactionToRedo());
         }
     }
 
@@ -39,9 +42,11 @@ const LoggedIn = (props) => {
         let index = subregions.indexOf(props.activeRegion._id);
         if (index != subregions.length-1) {
             props.setRegionViewer(subregions[index+1]);
+            props.tps.clearAllTransactions();
+            props.setCanUndo(props.tps.hasTransactionToUndo());
+            props.setCanRedo(props.tps.hasTransactionToRedo());
         }
     }
-    console.log(props.showRegionViewer);
     return (
         <WNavItem hoverAnimation="lighten">
             {props.showRegionViewer ? <WButton wType="texted" onClick = {handleLeftRegion}>
@@ -106,6 +111,11 @@ const NavbarOptions = (props) => {
                 user = {props.user} 
                 showRegionViewer = {props.showRegionViewer}
                 toggleWelcome={props.toggleWelcome} 
+                tps = {props.tps}
+                canUndo = {props.canUndo}
+                canRedo = {props.canRedo}
+                setCanUndo = {props.setCanUndo}
+                setCanRedo = {props.setCanRedo}
                 toggleShowMaps = {props.toggleShowMaps}/>
             }
         </>

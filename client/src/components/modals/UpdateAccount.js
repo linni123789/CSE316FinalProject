@@ -24,9 +24,18 @@ const UpdateAccount = (props) => {
 			}
 		}
 		const { loading, error, data } = await Update({ variables: { ...input, _id: props.user._id}});
-		toggleLoading(true);
-		props.setShowUpdate();
-		props.fetchUser();
+		if (data) {
+			toggleLoading(false);
+			if(data.update.email === 'already exists') {
+				alert('User with that email already registered');
+			}
+			else {
+				toggleLoading(true);
+				props.setShowUpdate();
+				props.fetchUser();
+			}
+
+		};
 	};
 
 	return (

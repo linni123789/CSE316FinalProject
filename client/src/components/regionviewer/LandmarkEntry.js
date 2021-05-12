@@ -28,10 +28,10 @@ const LandmarkEntry = (props) => {
                                 <div>
                                     {props.name}
                                 </div>
-                                <WButton className="table-entry-buttons" onClick={() => props.deleteLandmark(props._id, props.index)} wType="texted">
+                                <WButton disabled = "true" onClick={() => props.deleteLandmark(props._id, props.name, props.index)} wType="texted">
                                     <i className="material-icons">close</i>
                                 </WButton>
-                                <WButton className="table-entry-buttons" onClick={handleEditing} wType="texted">
+                                <WButton  disabled = "true" onClick={handleEditing} wType="texted">
                                     <i className="material-icons">edit</i>
                                 </WButton>
                             </div>

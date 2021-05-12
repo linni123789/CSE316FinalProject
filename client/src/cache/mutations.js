@@ -176,8 +176,8 @@ export const READD_SUBREGION = gql`
 
 
 export const ADD_LANDMARK= gql`
-mutation AddLandmark($_id: String!, $name: String!) {
-	addLandmark(_id: $_id, name: $name) 
+mutation AddLandmark($_id: String!, $name: String!, $index: Int!) {
+	addLandmark(_id: $_id, name: $name, index : $index) 
 }
 `;
 
@@ -190,5 +190,17 @@ mutation DeleteLandmark($_id: String!, $index: Int!) {
 export const UPDATE_LANDMARK= gql`
 mutation UpdateLandmark($_id: String!, $index: Int!, $name: String!) {
 	updateLandmark(_id: $_id, index: $index, name: $name) 
+}
+`;
+
+export const LATEST_MAP = gql`
+mutation LatestMap($_id: String!){
+	latestmap(_id: $_id)
+}
+`;
+
+export const CHANGE_PARENT = gql`
+mutation ChangeParent($_id: String!, $name: String!){
+	changeParent(_id: $_id, name: $name)
 }
 `;

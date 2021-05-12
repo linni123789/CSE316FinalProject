@@ -7,13 +7,15 @@ const MapList = (props) => {
         <>
             {
                 props.maps &&
-                props.maps.map(entry => (
+                props.maps.reverse().map(entry => (
                     <MapEntry
                         key={entry._id}
                         name={entry.name} _id={entry._id}
                         deleteMap = {props.deleteMap}
                         updateMapName = {props.updateMapName}
                         handleSetActive = {props.handleSetActive}
+                        setShowDelete = {props.setShowDelete}
+                        showDelete = {props.showDelete}
                     />
                 ))
             }

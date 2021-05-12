@@ -1,6 +1,5 @@
 import Logo 							from '../navbar/Logo';
 import Login 							from '../modals/Login';
-import Delete 							from '../modals/Delete';
 import UpdateAccount					from '../modals/UpdateAccount';
 import Spreadsheet 						from '../main/SpreadSheet';
 import RegionViewer 					from '../regionviewer/RegionViewer.js'
@@ -16,9 +15,10 @@ import { WNavbar, WSidebar, WNavItem } 	from 'wt-frontend';
 import { WLayout, WLHeader, WLMain, WLSide } from 'wt-frontend';
 import { UpdateSubRegionField_Transaction, 
 	DeleteSubRegion_Transaction,
-	UpdateListItems_Transaction, 
+	AddSubRegion_Transaction, 
 	SortRegion_Transaction, 
-	EditItem_Transaction } 				from '../../utils/jsTPS';
+	AddLandmark_Transaction,
+	DeleteLandmark_Transaction } 				from '../../utils/jsTPS';
 
 const Homescreen = (props) => {
 	const keyCombination = (e, callback) => {
@@ -41,10 +41,10 @@ const Homescreen = (props) => {
 	let activeSubRegions = [];
 	let parentRegion;
 
-	const [sortRule, setSortRule] = useState('unsorted'); // 1 is ascending, -1 desc
 	const [activeRegion, setActiveRegion] 		= useState({});
 	const [showRegionViewer, toggleShowRegionViewer] = useState(false);
 	const [showDelete, toggleShowDelete] 	= useState(false);
+	const [showRegionDelete, toggleRegionDelete]   = useState(false);
 	const [showLogin, toggleShowLogin] 		= useState(false);
 	const [showCreate, toggleShowCreate] 	= useState(false);
 	const [showUpdate, toggleShowUpdate]    = useState(false);
@@ -98,15 +98,6 @@ const Homescreen = (props) => {
 		onCompleted: () => reloadRegion()
 	}
 
-	// const [ReorderTodoItems] 		= useMutation(mutations.REORDER_ITEMS, mutationOptions);
-	// const [sortTodoItems] 		= useMutation(mutations.SORT_ITEMS, mutationOptions);
-	// const [UpdateTodoItemField] 	= useMutation(mutations.UPDATE_ITEM_FIELD, mutationOptions);
-	// const [UpdateTodolistField] 	= useMutation(mutations.UPDATE_TODOLIST_FIELD, mutationOptions);
-	// const [DeleteTodoItem] 			= useMutation(mutations.DELETE_ITEM, mutationOptions);
-	// const [AddTodoItem] 			= useMutation(mutations.ADD_ITEM, mutationOptions);
-	// const [AddTodolist] 			= useMutation(mutations.ADD_TODOLIST);
-	// const [DeleteTodolist] 			= useMutation(mutations.DELETE_TODOLIST);
-
 	const[AddMap] = useMutation(mutations.ADD_MAP);
 	const[DeleteMap] = useMutation(mutations.DELETE_MAP);
 	const[UpdateMap] = useMutation(mutations.UPDATE_MAP);
@@ -118,6 +109,8 @@ const Homescreen = (props) => {
 	const[AddLandmark] = useMutation(mutations.ADD_LANDMARK, mutationOptions);
 	const[DeleteLandmark] = useMutation(mutations.DELETE_LANDMARK, mutationOptions);
 	const[UpdateLandmark] = useMutation(mutations.UPDATE_LANDMARK, mutationOptions);
+	const[LatestMap] = useMutation(mutations.LATEST_MAP, mutationOptions);
+	const[ChangeParent] = useMutation(mutations.CHANGE_PARENT,mutationOptions)
 
 	
 	const tpsUndo = async () => {
@@ -136,49 +129,22 @@ const Homescreen = (props) => {
 		}
 	}
 
-	// const reorderItem = async (itemID, dir) => {
-	// 	let listID = activeList._id;
-	// 	let transaction = new ReorderItems_Transaction(listID, itemID, dir, ReorderTodoItems);
-	// 	props.tps.addTransaction(transaction);
-	// 	tpsRedo();
-
-	// };
-
-	// const createNewList = async () => {
-	// 	let list = {
-	// 		_id: '',
-	// 		name: 'Untitled',
-	// 		owner: props.user._id,
-	// 		items: [],
-	// 		sortRule: 'task',
-	// 		sortDirection: 1
-	// 	}
-	// 	const { data } = await AddTodolist({ variables: { todolist: list }, refetchQueries: [{ query: GET_DB_TODOS }] });
-	// 	if(data) {
-	// 		loadTodoList(data.addTodolist);
-	// 	} 
-		
-	// };
-	// const deleteList = async (_id) => {
-	// 	DeleteTodolist({ variables: { _id: _id }, refetchQueries: [{ query: GET_DB_TODOS }] });
-	// 	loadTodoList({});
-	// };
-
-	// const updateListField = async (_id, field, value, prev) => {
-	// 	let transaction = new UpdateListField_Transaction(_id, field, prev, value, UpdateTodolistField);
-	// 	props.tps.addTransaction(transaction);
-	// 	tpsRedo();
-
-	// };
 	const editSubRegion = async (_id, field, value, prev) => {
 		let transaction = new UpdateSubRegionField_Transaction(_id,field,prev,value,UpdateSubRegionField);
 		props.tps.addTransaction(transaction);
 		tpsRedo();
 	}
 
-	const handleSetActive = (_id) => {
+	const handleSetActive = async(_id) => {
+		props.tps.clearAllTransactions();
 		const selectedRegion = regions.find(region => region._id === _id);
 		loadRegion(selectedRegion);
+		if (selectedRegion.parentRegion == "None"){
+			await LatestMap({variables:{_id: _id, refetchQueries: [{query: GET_DB_REGION}]}});
+		}
+		props.tps.clearAllTransactions();
+		setCanUndo(props.tps.hasTransactionToUndo());
+		setCanRedo(props.tps.hasTransactionToRedo());
 	};
 
 	const reloadRegion = async () => {
@@ -191,9 +157,11 @@ const Homescreen = (props) => {
 	const setRegionViewer = (_id) => {
 		const selectedRegion = regions.find(region=> region._id === _id);
 		setActiveRegion(selectedRegion);
+		props.tps.clearAllTransactions();
+		setCanUndo(props.tps.hasTransactionToUndo());
+		setCanRedo(props.tps.hasTransactionToRedo());
 		toggleShowSpreadSheet(false);
 		toggleShowRegionViewer(true);
-		
 	}
 	const addMap = async(name) => {
 		let Map = {
@@ -218,14 +186,22 @@ const Homescreen = (props) => {
 	}
 
 	const addSubRegion = async() => {
-		const{data} = await AddNewSubRegion({variables:{_id: activeRegion._id}, refetchQueries: [{ query: GET_DB_REGION }]});
+		let transaction = new AddSubRegion_Transaction(activeRegion._id, AddNewSubRegion, DeleteSubRegion);
+		props.tps.addTransaction(transaction);
+		tpsRedo();
+	}
+
+	const changeParent = async(_id, name) => {
+		const {data} = await ChangeParent({variables:{_id: _id, name: name}, refetchQueries: [{ query: GET_DB_REGION }]});
+		if (data.changeParent == "notdone"){
+			alert("No region found");
+		}
 	}
 
 	const deleteSubRegion = async(_id, parentid, index) => {
 		let transaction = new DeleteSubRegion_Transaction(_id, parentid, index, DeleteSubRegion, ReAddSubRegion);
 		props.tps.addTransaction(transaction);
 		tpsRedo();
-
 	}
 
 	const goHome = () =>{
@@ -267,15 +243,20 @@ const Homescreen = (props) => {
 		let transaction = new SortRegion_Transaction(activeRegion._id, criteria, SortRegion);
 		props.tps.addTransaction(transaction);
 		tpsRedo();
-		
 	}
 
-	const addLandmark = async(_id, landmarkname) => {
-		const {data}  = await AddLandmark({variables:{_id: _id, name : landmarkname}});
+	const addLandmark = async(_id, landmarkname,index) => {
+		let transaction = new AddLandmark_Transaction(_id, landmarkname, index, AddLandmark, DeleteLandmark);
+		props.tps.addTransaction(transaction);
+		tpsRedo();
+		// const {data}  = await AddLandmark({variables:{_id: _id, name : landmarkname}});
 	}
 	
-	const deleteLandmark = async(_id, index) => {
-		const {data}  = await DeleteLandmark({variables:{_id: _id, index : index}});
+	const deleteLandmark = async(_id, landmarkname, index) => {
+		let transaction = new DeleteLandmark_Transaction(_id, landmarkname, index, DeleteLandmark, AddLandmark);
+		props.tps.addTransaction(transaction);
+		tpsRedo();
+		// const {data}  = await DeleteLandmark({variables:{_id: _id, index : index}});
 	}
 
 	const updateLandmark = async(_id, index, name) => {
@@ -308,6 +289,11 @@ const Homescreen = (props) => {
 							parentRegion = {parentRegion}
 							activeRegion = {activeRegion}
 							setRegionViewer = {setRegionViewer}
+							tps =  {props.tps}
+							canUndo = {canUndo}
+							canRedo = {canRedo}
+							setCanUndo = {setCanUndo}
+							setCanRedo = {setCanRedo}
 						/>
 					</ul>
 				</WNavbar>
@@ -334,6 +320,8 @@ const Homescreen = (props) => {
 									redo = {tpsRedo}
 									deleteSubRegion = {deleteSubRegion}
 									sort = {sort}
+									toggleRegionDelete = {toggleRegionDelete}
+									showRegionDelete = {showRegionDelete}
 								/>
 							</div>
 						:
@@ -347,13 +335,18 @@ const Homescreen = (props) => {
 					
 							<div className="container-secondary">
 								<RegionViewer
-									data = {activeRegion}
+									data = {activeRegion}			
 									regions = {regions}
 									handleSetActive = {handleSetActive}
 									parentRegion = {parentRegion}
 									addLandmark = {addLandmark}
 									updateLandmark = {updateLandmark}
 									deleteLandmark = {deleteLandmark}
+									canUndo = {canUndo}
+									canRedo = {canRedo}
+									undo = {tpsUndo}
+									redo = {tpsRedo}
+									changeParent = {changeParent}
 								/>
 							</div>
 						:
@@ -365,11 +358,11 @@ const Homescreen = (props) => {
 				showWelcome && (<Welcome/>)
 			}
 			{
-				showMaps && (<MapContents addMap = {addMap} handleSetActive = {handleSetActive} maps = {maps} deleteMap = {deleteMap} updateMapName = {updateMapName} reloadRegions={refetch}/>)
+				showMaps && (<MapContents setShowDelete = {setShowDelete}  showDelete = {showDelete} addMap = {addMap} handleSetActive = {handleSetActive} maps = {maps} deleteMap = {deleteMap} updateMapName = {updateMapName} reloadRegions={refetch}/>)
 			}
-			{
-				showDelete && (<Delete setShowDelete={setShowDelete} />)
-			}
+			{/* {
+				showDelete && (<Delete setShowDelete={setShowDelete} showDelete = {showDelete} />)
+			} */}
 
 			{
 				showCreate && (<CreateAccount fetchUser={props.fetchUser}toggleShowMaps = {toggleShowMaps} toggleWelcome = {toggleWelcome} setShowCreate={setShowCreate} />)

@@ -71,11 +71,14 @@ module.exports = {
 				subregions: []
 			})
 			const updated2 = await newSubRegion.save();
-			return "done";
+			return newRegionID;
 		},
 		updateField: async(_,args) => {
 			const{_id, field, value} = args;
 			const regionId = new ObjectId(_id);
+			if (field == "name"){
+				const updated = await Region.updateOne({_id:regionId}, {name: value});
+			}
 			if (field == "capital"){
 				const updated = await Region.updateOne({_id:regionId}, {capital: value});
 			}
@@ -165,11 +168,19 @@ module.exports = {
 
 		},
 		addLandmark: async(_,args) => {
-			const{_id, name} = args;
+			const{_id, name, index} = args;
 			const regionID = new ObjectId(_id);
-			const found = await Region.findOne({_id: regionID});
-			found.landmarks.push(name);
+			let found = await Region.findOne({_id: regionID});
+			// let regionName = found.name;
+			found.landmarks.splice(index, 0, name);
 			const updated = await Region.updateOne({_id:regionID}, {landmarks: found.landmarks});
+			// let ancestor = await Region.findOne({_id: regionID});
+			// while (ancestor.parentRegion != "None"){
+			// 	let ancestorID = new ObjectId(ancestor.parentRegion);
+			// 	let ancestor = await Region.findOne({_id: ancestorID});
+			// 	ancestor.landmarks.push(name+"-"+regionName);
+			// 	await Region.updateOne({_id:ancestorID}, {landmarks: ancestor.landmarks});
+			// }
 			return "done";
 		},
 		updateLandmark: async(_,args) => {
@@ -187,6 +198,48 @@ module.exports = {
 			const found = await Region.findOne({_id: regionID});
 			found.landmarks.splice(index,1);
 			const updated = await Region.updateOne({_id:regionID}, {landmarks: found.landmarks});
+			return "done";
+		},
+		latestmap: async(_,args) => {
+			const{_id} = args;
+			const regionID = new ObjectId(_id);
+			const found = await Region.findOne({_id: regionID});
+			// const {saved} = await found.save();
+			const {owner, capital, leader, name, parentRegion, landmarks, subregions } = found
+			let newRegion = new Region({
+				_id: _id,
+				owner: owner,
+				capital: capital,
+				leader: leader,
+				name: name,
+				parentRegion: parentRegion,
+				landmarks: landmarks,
+				subregions: subregions
+			})
+			const deleted = await Region.deleteOne({_id: regionID});
+			await newRegion.save();
+			return "done";
+		},
+		changeParent: async(_,args) => {
+			const{_id, name} = args;
+			if (await Region.findOne({name: name})){
+				const regionID = new ObjectId(_id);
+				const child = await Region.findOne({_id: regionID});
+				const parentregionID = new ObjectId(child.parentRegion);
+				const parent = await Region.findOne({_id: parentregionID});
+				var filtered = parent.subregions.filter(function(value, index, arr){ 
+					return value != child._id;
+				});
+				const updatedparent = await Region.updateOne({_id:parentregionID}, {subregions: filtered});
+				const newparent = await Region.findOne({name: name});
+				newparent.subregions.push(_id);
+				const updatedchild = await Region.updateOne({_id:regionID}, {parentRegion: newparent._id});
+				const newparentregionID = new ObjectId(newparent._id);
+				const updatednewparent = await Region.updateOne({_id: newparentregionID}, {subregions: newparent.subregions});
+			}
+			else{
+				return "notdone";
+			}
 			return "done";
 		}
 

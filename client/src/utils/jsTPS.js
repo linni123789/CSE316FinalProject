@@ -45,29 +45,62 @@ export class DeleteSubRegion_Transaction extends jsTPS_Transaction {
     }
 }
 
-
-/*  Handles item reordering */
-export class ReorderItems_Transaction extends jsTPS_Transaction {
-    constructor(listID, itemID, dir, callback) {
+export class AddSubRegion_Transaction extends jsTPS_Transaction{
+    constructor(_id, callback, undocallback) {
         super();
-        this.listID = listID;
-        this.itemID = itemID;
-		this.dir = dir;
-		this.revDir = dir === 1 ? -1 : 1;
-		this.updateFunction = callback;
-	}
-
+        this._id = _id;
+        this.updateFunction = callback;
+        this.undocallback = undocallback;
+    }
     async doTransaction() {
-		const { data } = await this.updateFunction({ variables: { itemId: this.itemID, _id: this.listID, direction: this.dir }});
+		const {data} = await this.updateFunction({ variables: { _id: this._id}});
+        const {addSubRegion} = data
+        this.regionId = addSubRegion;
+		return data;
+    }
+    async undoTransaction() {
+        const { data } = await this.undocallback({ variables: { _id: this.regionId, parentId: this._id}});
+		return data;
+    }
+}
+
+export class AddLandmark_Transaction extends jsTPS_Transaction{
+    constructor(_id, name, index, callback, undocallback) {
+        super();
+        this._id = _id;
+        this.name = name;
+        this.index = index;
+        this.updateFunction = callback;
+        this.undocallback = undocallback;
+    }
+    async doTransaction() {
+		const {data} = await this.updateFunction({variables:{_id: this._id, name : this.name, index: this.index}});
+		return data;
+    }
+    async undoTransaction() {
+        const { data } = await this.undocallback({variables:{_id: this._id, index : this.index}});
+		return data;
+    }
+}
+export class DeleteLandmark_Transaction extends jsTPS_Transaction{
+    constructor(_id, name, index, callback, undocallback){
+        super();
+        this._id = _id;
+        this.name = name;
+        this.index = index;
+        this.updateFunction = callback;
+        this.undocallback = undocallback;
+    }
+    async doTransaction() {
+		const { data } = await this.updateFunction({ variables: { _id: this._id, index: this.index }});
 		return data;
     }
 
     async undoTransaction() {
-		const { data } = await this.updateFunction({ variables: { itemId: this.itemID, _id: this.listID, direction: this.revDir }});
+		const { data } = await this.undocallback({ variables: { _id: this._id, name: this.name, index: this.index}});
 		return data;
 
     }
-    
 }
 
 export class SortRegion_Transaction extends jsTPS_Transaction{
@@ -169,6 +202,30 @@ export class UpdateListItems_Transaction extends jsTPS_Transaction {
         }
 		return data;
     }
+}
+
+/*  Handles item reordering */
+export class ReorderItems_Transaction extends jsTPS_Transaction {
+    constructor(listID, itemID, dir, callback) {
+        super();
+        this.listID = listID;
+        this.itemID = itemID;
+		this.dir = dir;
+		this.revDir = dir === 1 ? -1 : 1;
+		this.updateFunction = callback;
+	}
+
+    async doTransaction() {
+		const { data } = await this.updateFunction({ variables: { itemId: this.itemID, _id: this.listID, direction: this.dir }});
+		return data;
+    }
+
+    async undoTransaction() {
+		const { data } = await this.updateFunction({ variables: { itemId: this.itemID, _id: this.listID, direction: this.revDir }});
+		return data;
+
+    }
+    
 }
 
 

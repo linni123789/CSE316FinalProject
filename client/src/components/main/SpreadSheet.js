@@ -25,6 +25,8 @@ const SpreadSheet = (props) => {
                 setRegionViewer = {props.setRegionViewer}
                 editSubRegion = {props.editSubRegion}
                 deleteSubRegion = {props.deleteSubRegion}
+                toggleRegionDelete = {props.toggleRegionDelete}
+                showRegionDelete = {props.showRegionDelete}
             />
         </div>
     );

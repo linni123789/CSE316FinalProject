@@ -22,6 +22,8 @@ const MapContents = (props) => {
                         deleteMap = {props.deleteMap}
                         updateMapName = {props.updateMapName}
                         handleSetActive = {props.handleSetActive}
+                        setShowDelete = {props.setShowDelete}
+                        showDelete = {props.showDelete}
                     />
                 </WCol>
                 <WCol size = '6'>
