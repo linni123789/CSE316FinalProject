@@ -1,9 +1,16 @@
-import React        from 'react';
+
 import SpreadSheetEntry   from './SpreadSheetEntry';
+import React, { useState } from 'react';
 
 const SpreadSheetContents = (props) => {
     let entries = props.activeSubRegions;
-    
+    const [activeIndex, setIndex] = useState(-1);
+    const [editType, setEditType] = useState();
+    const handleMoving = (index,type) =>{
+        setIndex(index);
+        setEditType(type);
+    }
+
     return (
         entries !== undefined && entries.length > 0 ? <div className=' table-entries container-primary'>
             {
@@ -12,6 +19,7 @@ const SpreadSheetContents = (props) => {
                         data={entry} key={entry._id} index={index}
                         deleteItem={props.deleteItem} reorderItem={props.reorderItem}
                         editItem={props.editItem}
+                        length = {props.activeSubRegions.length}
                         handleSetActive = {props.handleSetActive}
                         setRegionViewer = {props.setRegionViewer}
                         editSubRegion ={props.editSubRegion}
@@ -19,6 +27,10 @@ const SpreadSheetContents = (props) => {
                         activeRegion = {props.activeRegion}
                         toggleRegionDelete = {props.toggleRegionDelete}
                         showRegionDelete = {props.showRegionDelete}
+                        handleMoving = {handleMoving}
+                        activeIndex = {activeIndex}
+                        editType = {editType}
+                        setIndex = {setIndex}
                     />
                 ))
             }

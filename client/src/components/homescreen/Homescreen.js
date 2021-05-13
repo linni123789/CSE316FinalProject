@@ -10,6 +10,7 @@ import NavbarOptions 					from '../navbar/NavbarOptions';
 import * as mutations 					from '../../cache/mutations';
 import { GET_DB_REGION } 				from '../../cache/queries';
 import React, { useState } 				from 'react';
+import Navigate from '../navbar/Navigate';
 import { useMutation, useQuery } 		from '@apollo/client';
 import { WNavbar, WSidebar, WNavItem } 	from 'wt-frontend';
 import { WLayout, WLHeader, WLMain, WLSide } from 'wt-frontend';
@@ -40,8 +41,9 @@ const Homescreen = (props) => {
 	let maps = [];
 	let activeSubRegions = [];
 	let parentRegion;
-
-	const [activeRegion, setActiveRegion] 		= useState({});
+	let ancestorlist = [];
+	
+	const [activeRegion, setActiveRegion] 		= useState(null);
 	const [showRegionViewer, toggleShowRegionViewer] = useState(false);
 	const [showDelete, toggleShowDelete] 	= useState(false);
 	const [showRegionDelete, toggleRegionDelete]   = useState(false);
@@ -51,6 +53,7 @@ const Homescreen = (props) => {
 	const [showWelcome, toggleWelcome] 		= useState(true);
 	const [showMaps, toggleShowMaps]        = useState(false);
 	const [showSpreadSheet, toggleShowSpreadSheet]  = useState(false);
+	const [showStatus, toggleShowStatus] = useState(false);
 	const [canUndo, setCanUndo] = useState(props.tps.hasTransactionToUndo());
 	const [canRedo, setCanRedo] = useState(props.tps.hasTransactionToRedo());
 
@@ -82,9 +85,15 @@ const Homescreen = (props) => {
 				}
 			})
 		}
+		if (activeRegion !== null){
+			let currentRegion = activeRegion;
+			while (currentRegion.parentRegion !== "None"){
+				parentRegion = regions.find(region => currentRegion.parentRegion === region._id);
+				ancestorlist.push(parentRegion);
+				currentRegion = parentRegion;
+			}
+		}
 	}
-	
-
 	const loadRegion = (region) => {
 		setActiveRegion(region);
 		toggleShowMaps(false);
@@ -143,6 +152,7 @@ const Homescreen = (props) => {
 			await LatestMap({variables:{_id: _id, refetchQueries: [{query: GET_DB_REGION}]}});
 		}
 		props.tps.clearAllTransactions();
+		toggleShowStatus(true);
 		setCanUndo(props.tps.hasTransactionToUndo());
 		setCanRedo(props.tps.hasTransactionToRedo());
 	};
@@ -160,6 +170,7 @@ const Homescreen = (props) => {
 		props.tps.clearAllTransactions();
 		setCanUndo(props.tps.hasTransactionToUndo());
 		setCanRedo(props.tps.hasTransactionToRedo());
+		toggleShowStatus(true);
 		toggleShowSpreadSheet(false);
 		toggleShowRegionViewer(true);
 	}
@@ -209,6 +220,7 @@ const Homescreen = (props) => {
 		toggleShowRegionViewer(false);
 		toggleShowSpreadSheet(false);
 		setActiveRegion(null);
+		toggleShowStatus(false);
 	}
 
 	const setShowLogin = () => {
@@ -246,10 +258,14 @@ const Homescreen = (props) => {
 	}
 
 	const addLandmark = async(_id, landmarkname,index) => {
-		let transaction = new AddLandmark_Transaction(_id, landmarkname, index, AddLandmark, DeleteLandmark);
-		props.tps.addTransaction(transaction);
-		tpsRedo();
-		// const {data}  = await AddLandmark({variables:{_id: _id, name : landmarkname}});
+		if (activeRegion.landmarks.indexOf(landmarkname) == -1){
+			let transaction = new AddLandmark_Transaction(_id, landmarkname, index, AddLandmark, DeleteLandmark);
+			props.tps.addTransaction(transaction);
+			tpsRedo();
+		}
+		else{
+			alert("Same landmark name");
+		}
 	}
 	
 	const deleteLandmark = async(_id, landmarkname, index) => {
@@ -270,7 +286,10 @@ const Homescreen = (props) => {
 					<ul>
 						<WNavItem>
 							<Logo className='logo' goHome={goHome}/>
-
+							{showStatus && <Navigate
+							handleSetActive = {handleSetActive}
+							ancestorlist = {ancestorlist}
+							/>}
 						</WNavItem>
 					</ul>
 					<ul>

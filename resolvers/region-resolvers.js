@@ -172,8 +172,14 @@ module.exports = {
 			const regionID = new ObjectId(_id);
 			let found = await Region.findOne({_id: regionID});
 			// let regionName = found.name;
-			found.landmarks.splice(index, 0, name);
-			const updated = await Region.updateOne({_id:regionID}, {landmarks: found.landmarks});
+			if (found.landmarks.indexOf(name) == -1){
+				found.landmarks.splice(index, 0, name);
+				const updated = await Region.updateOne({_id:regionID}, {landmarks: found.landmarks});
+			}
+			else{
+				return "notdone";
+			}
+
 			// let ancestor = await Region.findOne({_id: regionID});
 			// while (ancestor.parentRegion != "None"){
 			// 	let ancestorID = new ObjectId(ancestor.parentRegion);

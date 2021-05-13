@@ -1,23 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { WCol, WRow, WNavItem, WInput, WModal, WMHeader, WMMain, WButton  } from 'wt-frontend';
 
 const SpreadSheetEntry = (props) => {
     const { data } = props;
-    // const completeStyle = data.completed ? ' complete-task' : ' incomplete-task';
-    // const assignedToStyle = data.completed ? 'complete-task-assignedTo' : 'incomplete-task-assignedTo';
     var timer = 0;
     const name = data.name;
     const capital = data.capital;
     const leader = data.leader;
     const landmarks = data.landmarks;
-
-    // const canMoveUp = props.index > 0 ? true : false;
-    // const canMoveDown = props.index < props.entryCount-1 ? true : false;
     
     const [editingName, toggleNameEdit] = useState(false);
     const [editingCapital, toggleCapitalEdit] = useState(false);
     const [editingLeader, toggleLeaderEdit] = useState(false);
-    const [editingAssigned, toggleAssignEdit] = useState(false);
+
     const handleRegionViewer = () => {
         props.setRegionViewer(data._id);
     }
@@ -27,7 +22,8 @@ const SpreadSheetEntry = (props) => {
     }
 
     const handleNameEdit = (e) => {
-        toggleNameEdit(false);
+        props.setIndex(-1);
+        toggleNameEdit(!editingName);
         const newName = e.target.value ? e.target.value : 'None';
         const prevName = name;
         if(newName !== prevName) {
@@ -35,7 +31,8 @@ const SpreadSheetEntry = (props) => {
         }
     };
     const handleCapitalEdit = (e) => {
-        toggleCapitalEdit(false);
+        props.setIndex(-1);
+        toggleCapitalEdit(!editingCapital);
         const newCapital = e.target.value ? e.target.value : 'None';
         const prevCapital = capital;
         if(newCapital !== prevCapital) {
@@ -44,7 +41,8 @@ const SpreadSheetEntry = (props) => {
     };
 
     const handleLeaderEdit = (e) => {
-        toggleLeaderEdit(false);
+        props.setIndex(-1);
+        toggleLeaderEdit(!editingLeader);
         const newLeader = e.target.value ? e.target.value : 'None';
         const prevLeader = leader;
         if(newLeader !== prevLeader) {
@@ -52,6 +50,9 @@ const SpreadSheetEntry = (props) => {
         }
     };
 
+    const handleMoving = (movement, editType) => {
+        props.handleMoving(props.index+movement, editType);
+    }
 
     const handleClick = (event) =>{
         clearTimeout(timer);
@@ -64,13 +65,49 @@ const SpreadSheetEntry = (props) => {
         }
     }
 
+    useEffect( () => {
+        if (props.editType === "name"){
+            if (editingName === false){
+                toggleNameEdit(props.index === props.activeIndex);
+            }
+        }
+        if (props.editType === "capital"){
+            if (editingCapital === false){
+                toggleCapitalEdit(props.index === props.activeIndex);
+            }
+        }
+        if (props.editType === "leader"){
+            if (editingLeader === false){
+                toggleLeaderEdit(props.index === props.activeIndex);
+            }
+        }
+
+    });
+
     return (
         <WRow className='table-entry'>
             <WCol size="3"> 
                 {
                     editingName
                         ? <WInput
-                            className='table-input' onBlur={handleNameEdit}
+                            className='table-input' 
+                            onKeyDown={(e) => {
+                                if (e.keyCode === 13) {handleNameEdit(e)};
+                                if (e.keyCode === 39) {
+                                    toggleCapitalEdit(!editingCapital);
+                                    toggleNameEdit(!editingName); 
+                                }
+                                if (e.keyCode === 40 && props.index != props.length-1){
+                                    toggleNameEdit(!editingName); 
+                                    handleMoving(1, "name");
+                                }
+                                if (e.keyCode === 38 && props.index != 0){
+                                    toggleNameEdit(!editingName); 
+                                    handleMoving(-1, "name");
+                                }
+                            }
+                            }
+                            onBlur={handleNameEdit}
                             autoFocus={true} defaultValue={name} type='text'
                             inputClass="table-input-class"
                            />
@@ -84,7 +121,28 @@ const SpreadSheetEntry = (props) => {
             <WCol size="2">
                 {
                     editingCapital ? <WInput
-                            className='table-input' onBlur={handleCapitalEdit}
+                            className='table-input'
+                            onKeyDown={(e) => {
+                                if (e.keyCode === 13) handleCapitalEdit(e);
+                                if (e.keyCode === 39) {
+                                    toggleCapitalEdit(!editingCapital);
+                                    toggleLeaderEdit(!editingLeader)
+                                }
+                                if (e.keyCode === 37){
+                                    toggleCapitalEdit(!editingCapital);
+                                    toggleNameEdit(!editingName);   
+                                }
+                                if (e.keyCode === 40 && props.index != props.length-1){
+                                    toggleCapitalEdit(!editingCapital); 
+                                    handleMoving(1, "capital");
+                                }
+                                if (e.keyCode === 38 && props.index != 0){
+                                    toggleCapitalEdit(!editingCapital); 
+                                    handleMoving(-1, "capital");
+                                }
+                            }
+                            }
+                            onBlur={handleCapitalEdit}
                             autoFocus={true} defaultValue={capital} type='text'
                             inputClass="table-input-class"/>
                         :
@@ -95,9 +153,26 @@ const SpreadSheetEntry = (props) => {
             <WCol size="2">
                 {
                     editingLeader ? <WInput
-                    className='table-input' onBlur={handleLeaderEdit}
-                    autoFocus={true} defaultValue={leader} type='text'
-                    inputClass="table-input-class"/>
+                            className='table-input' 
+                            onKeyDown={(e) => {
+                                if (e.keyCode === 13) handleLeaderEdit(e);
+                                if (e.keyCode === 37){
+                                    toggleLeaderEdit(!editingLeader);
+                                    toggleCapitalEdit(!editingCapital);   
+                                }
+                                if (e.keyCode === 40 && props.index != props.length-1){
+                                    toggleLeaderEdit(!editingLeader); 
+                                    handleMoving(1, "leader");
+                                }
+                                if (e.keyCode === 38 && props.index != 0){
+                                    toggleLeaderEdit(!editingLeader); 
+                                    handleMoving(-1, "leader");
+                                }
+                            }
+                            }
+                            onBlur={handleLeaderEdit}
+                            autoFocus={true} defaultValue={leader} type='text'
+                            inputClass="table-input-class"/>
                 :
                          <div className="table-text" onClick = {()=> toggleLeaderEdit(true)}>
                             {leader}

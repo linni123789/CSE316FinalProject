@@ -37,7 +37,6 @@ const RegionViewerTable = (props) => {
     }
     regionTraversal(currentRegion);
 
-    console.log(alllandmarks)
     return (
         <WLayout Wlayout = "header-footer">
             <WLHeader>
@@ -72,6 +71,8 @@ const RegionViewerTable = (props) => {
                     name = {entry}
                     _id = {props.data._id}
                     index = {index}
+                    deleteLandmark = {props.deleteLandmark}
+                    updateLandmark = {props.updateLandmark}
                 />
             ))}
             </WLMain>

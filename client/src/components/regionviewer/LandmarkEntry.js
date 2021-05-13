@@ -5,16 +5,25 @@ const LandmarkEntry = (props) => {
     const [editing, toggleEditing] = useState(false);
     const [preEdit, setPreEdit] = useState(props.name);
     const handleEditing = (e) => {
-        e.stopPropagation();
-        setPreEdit(props.name);
-        toggleEditing(!editing);
+        if (props.current){
+            e.stopPropagation();
+            setPreEdit(props.name);
+            toggleEditing(!editing);
+        }
     };
 
     const handleSubmit = (e) => {
-        handleEditing(e);
-        props.updateLandmark(props._id, props.index, e.target.value);
+        if (props.current){
+            handleEditing(e);
+            props.updateLandmark(props._id, props.index, e.target.value);
+        }
     };
     
+    const handledeleteLandmark = (e) => {
+        if (props.current){
+            props.deleteLandmark(props._id, props.name, props.index)
+        }
+    }
     return (
         <div> 
 
@@ -28,10 +37,10 @@ const LandmarkEntry = (props) => {
                                 <div>
                                     {props.name}
                                 </div>
-                                <WButton disabled = "true" onClick={() => props.deleteLandmark(props._id, props.name, props.index)} wType="texted">
+                                <WButton disabled = {!props.current} onClick={handledeleteLandmark} wType="texted">
                                     <i className="material-icons">close</i>
                                 </WButton>
-                                <WButton  disabled = "true" onClick={handleEditing} wType="texted">
+                                <WButton  disabled = {!props.current} onClick={handleEditing} wType="texted">
                                     <i className="material-icons">edit</i>
                                 </WButton>
                             </div>
