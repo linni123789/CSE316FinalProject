@@ -78,7 +78,7 @@ const RegionViewerTable = (props) => {
             </WLMain>
             <WLFooter>
                 <WRow>
-                    <WCol size = "2">
+                    <WCol size = "5">
                         <WInput id= "landmarkinput" type = "text"></WInput>
                     </WCol>
                     <WCol size = "1">
@@ -88,7 +88,7 @@ const RegionViewerTable = (props) => {
                     </WCol>
                 </WRow>
                 <WRow>
-                    <WCol size = "2">
+                    <WCol size = "5">
                         <WInput id= "changeparentinput" type = "text"></WInput>
                     </WCol>
                     <WCol size = "1">
