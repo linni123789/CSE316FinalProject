@@ -31,6 +31,7 @@ const SpreadSheetContents = (props) => {
                         activeIndex = {activeIndex}
                         editType = {editType}
                         setIndex = {setIndex}
+                        setEditType = {setEditType}
                     />
                 ))
             }

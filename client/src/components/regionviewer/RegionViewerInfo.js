@@ -4,7 +4,7 @@ import { WCol, WRow ,WLayout, WLMain, WLFooter,WLHeader} from 'wt-frontend';
 const RegionViewerInfo = (props) => {
 
     return (
-        <WLayout WLayout = "header-footer">
+        <WLayout WLayout = "header-footer" id ="regioninfo">
             <WLHeader>
             </WLHeader>
             <WLMain>

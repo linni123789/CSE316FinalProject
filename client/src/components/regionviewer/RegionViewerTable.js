@@ -38,7 +38,7 @@ const RegionViewerTable = (props) => {
     regionTraversal(currentRegion);
 
     return (
-        <WLayout Wlayout = "header-footer">
+        <WLayout Wlayout = "header-footer" id ="regiontable">
             <WLHeader>
                 <WRow>
                 <WCol size='6'>

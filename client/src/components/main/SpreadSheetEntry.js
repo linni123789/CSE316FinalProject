@@ -69,20 +69,27 @@ const SpreadSheetEntry = (props) => {
         if (props.editType === "name"){
             if (editingName === false){
                 toggleNameEdit(props.index === props.activeIndex);
+                props.setEditType("");
             }
         }
         if (props.editType === "capital"){
             if (editingCapital === false){
                 toggleCapitalEdit(props.index === props.activeIndex);
+                props.setEditType("");
             }
         }
         if (props.editType === "leader"){
             if (editingLeader === false){
                 toggleLeaderEdit(props.index === props.activeIndex);
+                props.setEditType("");
             }
         }
-
     });
+
+    // var img = document.createElement("img");
+    // img.src = "Algeria Flag.png";
+    // var src = document.getElementById("flag")
+    // src.appendChild(img);
 
     return (
         <WRow className='table-entry'>
@@ -188,7 +195,7 @@ const SpreadSheetEntry = (props) => {
                     //     <option value="complete">complete</option>
                     //     <option value="incomplete">incomplete</option>
                     // </select>
-                         <div className="table-text">
+                         <div className="table-text" id = "flag">
                             Flag
                         </div>
                 }
