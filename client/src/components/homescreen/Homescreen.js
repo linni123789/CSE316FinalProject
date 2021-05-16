@@ -45,8 +45,6 @@ const Homescreen = (props) => {
 	
 	const [activeRegion, setActiveRegion] 		= useState(null);
 	const [showRegionViewer, toggleShowRegionViewer] = useState(false);
-	const [showDelete, toggleShowDelete] 	= useState(false);
-	const [showRegionDelete, toggleRegionDelete]   = useState(false);
 	const [showLogin, toggleShowLogin] 		= useState(false);
 	const [showCreate, toggleShowCreate] 	= useState(false);
 	const [showUpdate, toggleShowUpdate]    = useState(false);
@@ -224,30 +222,20 @@ const Homescreen = (props) => {
 	}
 
 	const setShowLogin = () => {
-		toggleShowDelete(false);
 		toggleShowCreate(false);
 		toggleShowUpdate(false);
 		toggleShowLogin(!showLogin);
 	};
 
 	const setShowCreate = () => {
-		toggleShowDelete(false);
 		toggleShowLogin(false);
 		toggleShowUpdate(false);
 		toggleShowCreate(!showCreate);
-	};
-
-	const setShowDelete = () => {
-		toggleShowCreate(false);
-		toggleShowLogin(false);
-		toggleShowUpdate(false);
-		toggleShowDelete(!showDelete)
 	};
 	
 	const setShowUpdate = () => {
 		toggleShowCreate(false);
 		toggleShowLogin(false);
-		toggleShowDelete(false);
 		toggleShowUpdate(!showUpdate);
 	};
 
@@ -324,7 +312,6 @@ const Homescreen = (props) => {
 					
 							<div className="container-secondary">
 								<Spreadsheet
-									setShowDelete={setShowDelete}
 									activeRegion={activeRegion} setActiveList={loadRegion}
 									regions = {regions}
 									addSubRegion={addSubRegion}
@@ -339,8 +326,7 @@ const Homescreen = (props) => {
 									redo = {tpsRedo}
 									deleteSubRegion = {deleteSubRegion}
 									sort = {sort}
-									toggleRegionDelete = {toggleRegionDelete}
-									showRegionDelete = {showRegionDelete}
+									ancestorlist = {ancestorlist}
 								/>
 							</div>
 						:
@@ -377,11 +363,8 @@ const Homescreen = (props) => {
 				showWelcome && (<Welcome/>)
 			}
 			{
-				showMaps && (<MapContents setShowDelete = {setShowDelete}  showDelete = {showDelete} addMap = {addMap} handleSetActive = {handleSetActive} maps = {maps} deleteMap = {deleteMap} updateMapName = {updateMapName} reloadRegions={refetch}/>)
+				showMaps && (<MapContents addMap = {addMap} handleSetActive = {handleSetActive} maps = {maps} deleteMap = {deleteMap} updateMapName = {updateMapName} reloadRegions={refetch}/>)
 			}
-			{/* {
-				showDelete && (<Delete setShowDelete={setShowDelete} showDelete = {showDelete} />)
-			} */}
 
 			{
 				showCreate && (<CreateAccount fetchUser={props.fetchUser}toggleShowMaps = {toggleShowMaps} toggleWelcome = {toggleWelcome} setShowCreate={setShowCreate} />)

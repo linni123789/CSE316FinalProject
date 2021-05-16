@@ -27,6 +27,7 @@ const SpreadSheet = (props) => {
                 deleteSubRegion = {props.deleteSubRegion}
                 toggleRegionDelete = {props.toggleRegionDelete}
                 showRegionDelete = {props.showRegionDelete}
+                ancestorlist = {props.ancestorlist}
             />
         </div>
     );

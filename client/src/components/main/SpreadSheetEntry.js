@@ -1,6 +1,7 @@
 import React, { useState, useEffect} from 'react';
 import { WCol, WRow, WNavItem, WInput, WModal, WMHeader, WMMain, WButton  } from 'wt-frontend';
 
+
 const SpreadSheetEntry = (props) => {
     const { data } = props;
     var timer = 0;
@@ -12,13 +13,13 @@ const SpreadSheetEntry = (props) => {
     const [editingName, toggleNameEdit] = useState(false);
     const [editingCapital, toggleCapitalEdit] = useState(false);
     const [editingLeader, toggleLeaderEdit] = useState(false);
+    const [showRegionDelete, toggleRegionDelete]   = useState(false);
 
     const handleRegionViewer = () => {
         props.setRegionViewer(data._id);
     }
     const handleDelete = () => {
         props.deleteSubRegion(data._id, props.activeRegion._id, props.index);
-        props.toggleRegionDelete(false);
     }
 
     const handleNameEdit = (e) => {
@@ -86,11 +87,6 @@ const SpreadSheetEntry = (props) => {
         }
     });
 
-    // var img = document.createElement("img");
-    // img.src = "Algeria Flag.png";
-    // var src = document.getElementById("flag")
-    // src.appendChild(img);
-
     return (
         <WRow className='table-entry'>
             <WCol size="3"> 
@@ -101,14 +97,17 @@ const SpreadSheetEntry = (props) => {
                             onKeyDown={(e) => {
                                 if (e.keyCode === 13) {handleNameEdit(e)};
                                 if (e.keyCode === 39) {
+                                    handleNameEdit(e);
                                     toggleCapitalEdit(!editingCapital);
                                     toggleNameEdit(!editingName); 
                                 }
                                 if (e.keyCode === 40 && props.index != props.length-1){
+                                    handleNameEdit(e);
                                     toggleNameEdit(!editingName); 
                                     handleMoving(1, "name");
                                 }
                                 if (e.keyCode === 38 && props.index != 0){
+                                    handleNameEdit(e);
                                     toggleNameEdit(!editingName); 
                                     handleMoving(-1, "name");
                                 }
@@ -132,18 +131,22 @@ const SpreadSheetEntry = (props) => {
                             onKeyDown={(e) => {
                                 if (e.keyCode === 13) handleCapitalEdit(e);
                                 if (e.keyCode === 39) {
+                                    handleCapitalEdit(e)
                                     toggleCapitalEdit(!editingCapital);
                                     toggleLeaderEdit(!editingLeader)
                                 }
                                 if (e.keyCode === 37){
+                                    handleCapitalEdit(e)
                                     toggleCapitalEdit(!editingCapital);
                                     toggleNameEdit(!editingName);   
                                 }
                                 if (e.keyCode === 40 && props.index != props.length-1){
+                                    handleCapitalEdit(e)
                                     toggleCapitalEdit(!editingCapital); 
                                     handleMoving(1, "capital");
                                 }
                                 if (e.keyCode === 38 && props.index != 0){
+                                    handleCapitalEdit(e)
                                     toggleCapitalEdit(!editingCapital); 
                                     handleMoving(-1, "capital");
                                 }
@@ -164,14 +167,17 @@ const SpreadSheetEntry = (props) => {
                             onKeyDown={(e) => {
                                 if (e.keyCode === 13) handleLeaderEdit(e);
                                 if (e.keyCode === 37){
+                                    handleLeaderEdit(e)
                                     toggleLeaderEdit(!editingLeader);
                                     toggleCapitalEdit(!editingCapital);   
                                 }
                                 if (e.keyCode === 40 && props.index != props.length-1){
+                                    handleLeaderEdit(e)
                                     toggleLeaderEdit(!editingLeader); 
                                     handleMoving(1, "leader");
                                 }
                                 if (e.keyCode === 38 && props.index != 0){
+                                    handleLeaderEdit(e)
                                     toggleLeaderEdit(!editingLeader); 
                                     handleMoving(-1, "leader");
                                 }
@@ -195,9 +201,9 @@ const SpreadSheetEntry = (props) => {
                     //     <option value="complete">complete</option>
                     //     <option value="incomplete">incomplete</option>
                     // </select>
-                         <div className="table-text" id = "flag">
-                            Flag
-                        </div>
+    
+                    <img id = "spreadflag" src = {"./The World/"+name+" flag"+".png"}></img>
+
                 }
             </WCol>
             <WCol size="1">
@@ -209,7 +215,7 @@ const SpreadSheetEntry = (props) => {
             </WCol>
             <WCol size=".5">
                 {
-                    <WButton  wType="texted" onClick = {() => props.toggleRegionDelete(true)}>
+                    <WButton  wType="texted" onClick = {() => toggleRegionDelete(true)}>
                          <i className="material-icons">delete</i>
                     </WButton>
                 }
@@ -222,13 +228,13 @@ const SpreadSheetEntry = (props) => {
                 }
             </WCol>
             { 
-                <WModal className="delete-modal" cover="true" visible={props.showRegionDelete}>
-                <WMHeader  className="modal-header" onClose={() => props.toggleRegionDelete(false)}>
+                <WModal className="delete-modal" cover="true" visible={showRegionDelete}>
+                <WMHeader  className="modal-header" onClose={() => toggleRegionDelete(false)}>
                     Delete {name}?
                 </WMHeader >
 
                 <WMMain>
-                    <WButton className="modal-button cancel-button" onClick={() => props.toggleRegionDelete(false)} wType="texted">
+                    <WButton className="modal-button cancel-button" onClick={() => toggleRegionDelete(false)} wType="texted">
                         Cancel
                     </WButton>
                     <label className="col-spacer">&nbsp;</label>

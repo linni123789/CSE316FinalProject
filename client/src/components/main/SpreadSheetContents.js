@@ -32,6 +32,7 @@ const SpreadSheetContents = (props) => {
                         editType = {editType}
                         setIndex = {setIndex}
                         setEditType = {setEditType}
+                        ancestorlist = {props.ancestorlist}
                     />
                 ))
             }

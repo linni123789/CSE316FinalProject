@@ -4,12 +4,12 @@ import { WNavItem, WInput, WModal, WMHeader, WMMain, WButton  } from 'wt-fronten
 const MapEntry = (props) => {
     const [editing, toggleEditing] = useState(false);
     const [preEdit, setPreEdit] = useState(props.name);
+    const [showDelete, setShowDelete] 	= useState(false);
     const handleEditing = (e) => {
         e.stopPropagation();
         setPreEdit(props.name);
         toggleEditing(!editing);
     };
-
     const handleSubmit = (e) => {
         handleEditing(e);
         props.updateMapName(props._id, e.target.value);
@@ -17,7 +17,6 @@ const MapEntry = (props) => {
 
     const handleDelete = () => {
         props.deleteMap(props._id);
-        props.setShowDelete(false);
     }
     return (
         <WNavItem 
@@ -32,7 +31,7 @@ const MapEntry = (props) => {
                                 <div onClick={() => { props.handleSetActive(props._id) }} >
                                     {props.name}
                                 </div>
-                                <WButton className="table-entry-buttons" onClick={() => props.setShowDelete(true)} wType="texted">
+                                <WButton className="table-entry-buttons" onClick={() => setShowDelete(true)} wType="texted">
                                     <i className="material-icons">close</i>
                                 </WButton>
                                 <WButton className="table-entry-buttons" onClick={handleEditing} wType="texted">
@@ -43,13 +42,13 @@ const MapEntry = (props) => {
                             
             }
             { 
-                <WModal className="delete-modal" cover="true" visible={props.showDelete}>
-                <WMHeader  className="modal-header" onClose={() => props.setShowDelete(false)}>
+                <WModal className="delete-modal" cover="true" visible={showDelete}>
+                <WMHeader  className="modal-header" onClose={() => setShowDelete(false)}>
                     Delete {props.name}?
                 </WMHeader >
 
                 <WMMain>
-                    <WButton className="modal-button cancel-button" onClick={() => props.setShowDelete(false)} wType="texted">
+                    <WButton className="modal-button cancel-button" onClick={() => setShowDelete(false)} wType="texted">
                         Cancel
                     </WButton>
                     <label className="col-spacer">&nbsp;</label>

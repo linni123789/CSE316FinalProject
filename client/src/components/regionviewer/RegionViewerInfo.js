@@ -8,7 +8,7 @@ const RegionViewerInfo = (props) => {
             <WLHeader>
             </WLHeader>
             <WLMain>
-            <img className = 'flag' src='https://upload.wikimedia.org/wikipedia/en/thumb/a/a4/Flag_of_the_United_States.svg/1200px-Flag_of_the_United_States.svg.png'></img>
+            <img className = 'flag' src={"./The World/"+props.name+" flag"+".png"}></img>
             </WLMain>
         
         <WLFooter>

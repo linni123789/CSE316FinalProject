@@ -279,4 +279,14 @@ html {
 
 .flag{
     margin-bottom:10%;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+#spreadflag{
+    width:50%;
+    height:50%;
+    object-fit:cover;
+    margin-top:1.5%;
 }

@@ -62,6 +62,9 @@ const RegionViewerTable = (props) => {
                     index = {index}
                     deleteLandmark = {props.deleteLandmark}
                     updateLandmark = {props.updateLandmark}
+                    showLandmarkDelete = {props.showLandmarkDelete}
+                    toggleLandmarkDelete = {props.toggleLandmarkDelete}
+
                 />
             ))
             }
